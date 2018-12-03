@@ -69,6 +69,17 @@ public class Podcast {
 	private String website;
 	private String mygpo_link;
 
+	//Read from episode data
+	private String author;
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
 	public String getUrl() {
 		return url;
 	}
