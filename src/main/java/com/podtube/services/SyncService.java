@@ -1,8 +1,9 @@
 package com.podtube.services;
 
-import com.podtube.base.APIUtils;
-import com.podtube.base.GPodderCategory;
-import com.podtube.base.GPodderPodcast;
+import com.podtube.datasourceapi.APIUtils;
+import com.podtube.feedentities.RSSFeedItem;
+import com.podtube.gpodderentities.GPodderCategory;
+import com.podtube.gpodderentities.GPodderPodcast;
 import com.podtube.models.Category;
 import com.podtube.models.Episode;
 import com.podtube.models.Podcast;
@@ -12,7 +13,6 @@ import com.podtube.repositories.PodcastRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +47,7 @@ public class SyncService {
 				categoryForTag = categoryRepository.findByTagEquals(tag.toLowerCase());
 			}
 			catch (NullPointerException ex){
+				//TODO: Log this
 			}
 
 			if(categoryForTag==null){
@@ -85,6 +86,7 @@ public class SyncService {
 				podcastForUrl = podcastRepository.findByUrlEquals(url.toLowerCase());
 			}
 			catch (NullPointerException ex){
+				//TODO: Log this
 			}
 
 			if(podcastForUrl==null){
@@ -105,9 +107,55 @@ public class SyncService {
 		}//for..
 	}//syncPodcastsForCategoryFromGpodder..
 
-	public void syncEpisodesForPodcastFromGpodder(int podcastId){
+	public void syncEpisodesForPodcastFromRSSFeed(int podcastId){
 
-	}
+		Optional<Podcast> data = podcastRepository.findById(podcastId);
+		if(!data.isPresent()){
+			return;
+		}
+
+		Podcast podcast = data.get();
+
+		//Get categories from GPodder
+		List<RSSFeedItem> rssFeedItems = apiUtils.getEpisodesForPodcast(podcast.getUrl());
+
+		//
+		for(RSSFeedItem rssFeedItem: rssFeedItems){
+
+			//TODO: REVISIT THIS CRITERIA
+			//Considering url as unique criteria as of now for podcasts
+			String enclosure_link = rssFeedItem.getEnclosure_link();
+
+			Episode episodeForUrl = null;
+
+			try {
+				episodeForUrl = episodeRepository.findByEnclosureLinkEquals(enclosure_link.toLowerCase());
+			}
+			catch (NullPointerException ex){
+				//TODO: Log this
+			}
+
+			if(episodeForUrl==null){
+				//Add to database
+				Episode episode = new Episode();
+				episode.setPodcast(podcast);
+				episode.setTitle(rssFeedItem.getTitle());
+				episode.setPubDate(rssFeedItem.getPubDate());
+				episode.setLink(rssFeedItem.getLink());
+				episode.setGuid(rssFeedItem.getGuid());
+				episode.setAuthor(rssFeedItem.getAuthor());
+				episode.setThumbnail(rssFeedItem.getThumbnail());
+				episode.setDescription(rssFeedItem.getDescription());
+				episode.setContent(rssFeedItem.getContent());
+				episode.setEnclosureLink(rssFeedItem.getEnclosure_link());
+				episode.setEnclosureType(rssFeedItem.getEnclosure_type());
+				episode.setEnclosureDuration(rssFeedItem.getEnclosure_duration());
+				episode.setEnclosureLength(rssFeedItem.getEnclosure_length());
+				episode.setEnclosureThumbnail(rssFeedItem.getEnclosure_thumbnail());
+				episodeRepository.save(episode);
+			}//if..
+		}//for..
+	}//syncEpisodesForPodcastFromRSSFeed..
 
 	@PostMapping("/api/sync/categories")
 	public List<Category> syncCategories() {
@@ -120,13 +168,13 @@ public class SyncService {
 	public List<Podcast> syncPodcastsForCategory(@PathVariable("categoryId") int categoryId) {
 
 		this.syncPodcastsForCategoryFromGpodder(categoryId);
-		return (List<Podcast>) podcastRepository.findAll();
+		return (List<Podcast>) podcastRepository.findPodcastsByCategoryId(categoryId);
 	}
 
 	@PostMapping("/api/sync/podcasts/{podcastId}/episodes")
 	public List<Episode> syncEpisodesForPodcast(@PathVariable("podcastId") int podcastId) {
 
-		this.syncEpisodesForPodcastFromGpodder(podcastId);
-		return (List<Episode>) episodeRepository.findAll();
+		this.syncEpisodesForPodcastFromRSSFeed(podcastId);
+		return (List<Episode>) episodeRepository.findEpisodesByPodcastId(podcastId);
 	}
 }
