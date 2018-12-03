@@ -7,5 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 public interface PodcastRepository
 	extends CrudRepository<Podcast, Integer> {
 
+	Podcast findByUrlEquals(String url);
+
 
 }
