@@ -1,4 +1,4 @@
-package com.podtube.base;
+package com.podtube.gpodderentities;
 
 public interface GPodderCategory {
 
