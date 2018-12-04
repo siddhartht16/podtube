@@ -153,15 +153,31 @@ public class Podcast {
 	}
 
 
-	//	@ManyToOne
-//	@OnDelete(action = OnDeleteAction.CASCADE)
-////	@JsonIgnore
-//	private User createdBy;
-//
-//	@ManyToOne
-//	@OnDelete(action = OnDeleteAction.CASCADE)
-////	@JsonIgnore
-//	private User modifiedBy;
+	private String createdBy;
+	private String modifiedBy;
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getModifiedBy() {
+		return modifiedBy;
+	}
+
+	public void setModifiedBy(String modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
 
 
+	@OneToMany(mappedBy = "podcast", cascade= CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<Comment> comments = new ArrayList<Comment>();
+
+	@OneToMany(mappedBy = "podcast", cascade= CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<Rating> ratings = new ArrayList<Rating>();
 }

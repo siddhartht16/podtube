@@ -1,5 +1,6 @@
 package com.podtube.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.podtube.common.MediaTypes;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -16,20 +17,23 @@ import static com.podtube.common.AppConstants.*;
 @EntityListeners(AuditingEntityListener.class)
 public class Episode {
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	public Episode() {}
+
+	public Episode() {
+	}
 
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
 
 	@ManyToOne
 	@OnDelete(action = OnDeleteAction.CASCADE)
-//	@JsonIgnore
+	@JsonIgnore
 	private Podcast podcast;
 
 	public Date getCreatedOn() {
@@ -104,6 +108,7 @@ public class Episode {
 	@Lob
 	private String content;
 
+	//TODO: Consider scenarios where this may not have the media link, check in other places
 	private String enclosureLink;
 	private String enclosureType;
 	private Long enclosureLength;
@@ -190,10 +195,15 @@ public class Episode {
 		this.enclosureType = enclosureType;
 
 		//Set media type based off enclosure type
-		switch (this.enclosureType.toLowerCase()){
-			case GPODDER_MEDIA_TYPE_AUDIO:this.setMediaTypes(MediaTypes.AUDIO);break;
-			case GPODDER_MEDIA_TYPE_VIDEO:this.setMediaTypes(MediaTypes.VIDEO);break;
-			default:this.setMediaTypes(MediaTypes.AUDIO);
+		switch (this.enclosureType.toLowerCase()) {
+			case GPODDER_MEDIA_TYPE_AUDIO:
+				this.setMediaTypes(MediaTypes.AUDIO);
+				break;
+			case GPODDER_MEDIA_TYPE_VIDEO:
+				this.setMediaTypes(MediaTypes.VIDEO);
+				break;
+			default:
+				this.setMediaTypes(MediaTypes.AUDIO);
 		}
 	}
 
@@ -223,5 +233,28 @@ public class Episode {
 //Based off categories in episode json
 	//TODO: Revisit this
 	//private Category category;
+
+
+	private String createdBy;
+	private String modifiedBy;
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getModifiedBy() {
+		return modifiedBy;
+	}
+
+	public void setModifiedBy(String modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+
+	//TODO: Calculated field to compute played status for each user
+
 
 }

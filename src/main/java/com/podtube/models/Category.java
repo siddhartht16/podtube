@@ -64,6 +64,9 @@ public class Category {
 	@LastModifiedDate
 	private Date modifiedOn;
 
+	//TODO: Add many to many for category and podcast
+
+
 	public Date getCreatedOn() {
 		return createdOn;
 	}
@@ -72,14 +75,24 @@ public class Category {
 		return modifiedOn;
 	}
 
-	//	@ManyToOne
-//	@OnDelete(action = OnDeleteAction.CASCADE)
-////	@JsonIgnore
-//	private User createdBy;
-//
-//	@ManyToOne
-//	@OnDelete(action = OnDeleteAction.CASCADE)
-////	@JsonIgnore
-//	private User modifiedBy;
+	private String createdBy;
+	private String modifiedBy;
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getModifiedBy() {
+		return modifiedBy;
+	}
+
+	public void setModifiedBy(String modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+
 
 }

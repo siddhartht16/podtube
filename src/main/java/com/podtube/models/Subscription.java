@@ -27,4 +27,7 @@ public class Subscription {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+
+	//TODO: Add many to many for podcast and user
+
 }

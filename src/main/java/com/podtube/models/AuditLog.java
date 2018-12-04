@@ -1,16 +1,13 @@
 package com.podtube.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
-public class Playlist {
+public class AuditLog {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
@@ -21,15 +18,13 @@ public class Playlist {
 		this.id = id;
 	}
 
-	public Playlist() {}
+	public AuditLog() {}
 
-	private String title;
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
+	@ManyToOne
+//	@JsonIgnore
+	private User user;
+
+	private String log;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "created_on", nullable = false, updatable = false)
@@ -40,11 +35,4 @@ public class Playlist {
 	@Column(name = "modified_on", nullable = false)
 	@LastModifiedDate
 	private Date modifiedOn;
-
-	//TODO: Add multiple episodes in one playlist
-	//Episode is not concerned with playlist
-
-	@OneToOne
-//	@JsonIgnore
-	private User user;
 }
