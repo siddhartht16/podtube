@@ -1,6 +1,6 @@
 package com.podtube.models;
 
-import com.podtube.common.UserRoles;
+import com.podtube.common.UserRole;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,7 +16,15 @@ public class User {
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
 
-	private UserRoles userRoles;
+	public UserRole getUserRole() {
+		return userRole;
+	}
+
+	public void setUserRole(UserRole userRole) {
+		this.userRole = userRole;
+	}
+
+	private UserRole userRole;
 
 	private String username;
 	private String password;
@@ -57,13 +65,6 @@ public class User {
 		this.id = id;
 	}
 
-	public UserRoles getUserRoles() {
-		return userRoles;
-	}
-
-	public void setUserRoles(UserRoles userRoles) {
-		this.userRoles = userRoles;
-	}
 
 	public String getUsername() {
 		return username;
