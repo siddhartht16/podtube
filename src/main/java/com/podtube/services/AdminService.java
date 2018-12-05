@@ -1,8 +1,11 @@
 package com.podtube.services;
 
+import com.podtube.common.UserRole;
 import com.podtube.models.User;
 import com.podtube.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -17,20 +20,28 @@ public class AdminService {
     @GetMapping("/admin/users")
     public List<User> findAllUsers() {
 
-        return (List<User>) userRepository.findAll();
+        return userRepository.findAllByUserRoleEquals(UserRole.ADMIN);
     }
 
     @GetMapping("/admin/user/{userId}")
     public User findUserById(
             @PathVariable("userId") int userId
     ) {
-        return userRepository.findById(userId).get();
+        return userRepository.findByIdEqualsAndUserRoleEquals(userId, UserRole.ADMIN);
     }
 
     @PostMapping("/admin/users")
-    public List<User> createUser(@RequestBody User user) {
-        userRepository.save(user);
-        return (List<User>) userRepository.findAll();
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        try {
+            //Set as admin
+            user.setUserRole(UserRole.ADMIN);
+            User newUser = userRepository.save(user);
+            return new ResponseEntity<>(newUser, HttpStatus.OK);
+        }
+        catch (RuntimeException ex){
+            //TODO: Log this
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/admin/register")
