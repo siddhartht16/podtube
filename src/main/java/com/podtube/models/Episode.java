@@ -1,9 +1,6 @@
 package com.podtube.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.podtube.common.MediaTypes;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,66 +10,12 @@ import java.util.Date;
 
 import static com.podtube.common.AppConstants.*;
 
+//TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Episode {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
 
-	public Episode() {
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	@ManyToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	@JsonIgnore
-	private Podcast podcast;
-
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public Date getModifiedOn() {
-		return modifiedOn;
-	}
-
-	public Podcast getPodcast() {
-		return podcast;
-	}
-
-	public void setPodcast(Podcast podcast) {
-		this.podcast = podcast;
-	}
-
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "created_on", nullable = false, updatable = false)
-	@CreatedDate
-	private Date createdOn;
-
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "modified_on", nullable = false)
-	@LastModifiedDate
-	private Date modifiedOn;
-
-	private MediaTypes mediaTypes;
-
-	public MediaTypes getMediaTypes() {
-		return mediaTypes;
-	}
-
-	public void setMediaTypes(MediaTypes mediaTypes) {
-		this.mediaTypes = mediaTypes;
-	}
-
-//	{
+	//	{
 //		"title": "Episode 472 - 13 Piece Drought - 10/25/18",
 //			"pubDate": "2018-10-25 07:00:00",
 //			"link": "http://www.tested.com/old-categories/podcasts/853514-episode-472-13-piece-drought-102518/",
@@ -95,6 +38,14 @@ public class Episode {
 //		"categories": []
 //	},
 
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	@ManyToOne
+	private Podcast podcast;
+	private MediaTypes mediaTypes;
+
 	private String title;
 	private Date pubDate;
 	private String link;
@@ -114,6 +65,59 @@ public class Episode {
 	private Long enclosureLength;
 	private Long enclosureDuration;
 	private String enclosureThumbnail;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "created_on", nullable = false, updatable = false)
+	@CreatedDate
+	private Date createdOn;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "modified_on", nullable = false)
+	@LastModifiedDate
+	private Date modifiedOn;
+
+	private String createdBy;
+	private String modifiedBy;
+
+	@Transient
+	private boolean isPlayed;
+
+	public Episode() {
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+
+	public Date getCreatedOn() {
+		return createdOn;
+	}
+
+	public Date getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public Podcast getPodcast() {
+		return podcast;
+	}
+
+	public void setPodcast(Podcast podcast) {
+		this.podcast = podcast;
+	}
+
+	public MediaTypes getMediaTypes() {
+		return mediaTypes;
+	}
+
+	public void setMediaTypes(MediaTypes mediaTypes) {
+		this.mediaTypes = mediaTypes;
+	}
+
 
 	public String getTitle() {
 		return title;
@@ -227,16 +231,13 @@ public class Episode {
 		return enclosureThumbnail;
 	}
 
+	//Based off categories in episode json
+	//TODO: Revisit this
+	//private Category category;
 	public void setEnclosureThumbnail(String enclosureThumbnail) {
 		this.enclosureThumbnail = enclosureThumbnail;
 	}
-//Based off categories in episode json
-	//TODO: Revisit this
-	//private Category category;
 
-
-	private String createdBy;
-	private String modifiedBy;
 
 	public String getCreatedBy() {
 		return createdBy;
@@ -254,7 +255,27 @@ public class Episode {
 		this.modifiedBy = modifiedBy;
 	}
 
+
+	public boolean isPlayed() {
+		return isPlayed;
+	}
+
 	//TODO: Calculated field to compute played status for each user
+	public void setPlayed(boolean played) {
+		isPlayed = played;
+	}
 
+	// TODO: Verify if link is the unique business key
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Episode e = (Episode) o;
+		return link.equals(e.link);
+	}
 
+	@Override
+	public int hashCode() {
+		return link.hashCode();
+	}
 }

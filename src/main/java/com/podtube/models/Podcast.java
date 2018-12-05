@@ -1,62 +1,24 @@
 package com.podtube.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
+//TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Podcast {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
-	public Podcast() {}
 
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	@ManyToOne
-	@OnDelete(action = OnDeleteAction.CASCADE)
-//	@JsonIgnore
-	private Category category;
-
-	public Category getCategory() {
-		return category;
-	}
-
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "created_on", nullable = false, updatable = false)
-	@CreatedDate
-	private Date createdOn;
-
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "modified_on", nullable = false)
-	@LastModifiedDate
-	private Date modifiedOn;
-
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public Date getModifiedOn() {
-		return modifiedOn;
-	}
+	// TODO: Add join table and join column fields
+	@ManyToMany
+	private Set<Category> categories;
 
 	private String url;
 	private String title;
@@ -68,6 +30,50 @@ public class Podcast {
 	private String scaled_logo_url;
 	private String website;
 	private String mygpo_link;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "created_on", nullable = false, updatable = false)
+	@CreatedDate
+	private Date createdOn;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "modified_on", nullable = false)
+	@LastModifiedDate
+	private Date modifiedOn;
+
+	private String createdBy;
+	private String modifiedBy;
+
+	@Transient
+	private boolean isSubscribed;
+
+	@Transient
+	private double averageRating;
+
+	@Transient
+	private long numSubscriptions;
+
+	@Transient
+	private long subscribersLastWeek;
+
+	public Podcast() {}
+
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+
+
+	public Date getCreatedOn() {
+		return createdOn;
+	}
+
+	public Date getModifiedOn() {
+		return modifiedOn;
+	}
+
 
 	//Read from episode data
 	private String author;
@@ -152,10 +158,6 @@ public class Podcast {
 		this.mygpo_link = mygpo_link;
 	}
 
-
-	private String createdBy;
-	private String modifiedBy;
-
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -172,12 +174,47 @@ public class Podcast {
 		this.modifiedBy = modifiedBy;
 	}
 
+	public Set<Category> getCategories() {
+		return categories;
+	}
 
-	@OneToMany(mappedBy = "podcast", cascade= CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<Comment> comments = new ArrayList<Comment>();
+	public void setCategories(Set<Category> categories) {
+		this.categories = categories;
+	}
 
-	@OneToMany(mappedBy = "podcast", cascade= CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<Rating> ratings = new ArrayList<Rating>();
+	public boolean isSubscribed() {
+		return isSubscribed;
+	}
+
+	public void setSubscribed(boolean subscribed) {
+		isSubscribed = subscribed;
+	}
+
+	public double getAverageRating() {
+		return averageRating;
+	}
+
+	public void setAverageRating(double averageRating) {
+		this.averageRating = averageRating;
+	}
+
+	public long getNumSubscriptions() {
+		return numSubscriptions;
+	}
+
+	public void setNumSubscriptions(long numSubscriptions) {
+		this.numSubscriptions = numSubscriptions;
+	}
+
+	public long getSubscribersLastWeek() {
+		return subscribersLastWeek;
+	}
+
+	public void setSubscribersLastWeek(long subscribersLastWeek) {
+		this.subscribersLastWeek = subscribersLastWeek;
+	}
+
+	// TODO: Add add category function
+
+	// TODO: Add remove category function
 }

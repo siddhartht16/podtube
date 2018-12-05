@@ -10,19 +10,16 @@ import java.util.Date;
 //TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class PlayedStatus {
-
+public class FollowLink {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
 
     // TODO: Add join column field
-    @ManyToOne
-    private User user;
+    @ManyToOne User follower;
 
     // TODO: Add join column field
-    @ManyToOne
-    private Episode episode;
+    @ManyToOne User followee;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_on", nullable = false, updatable = false)
@@ -34,8 +31,6 @@ public class PlayedStatus {
     @LastModifiedDate
     private Date modifiedOn;
 
-    public PlayedStatus() {}
-
     public int getId() {
         return id;
     }
@@ -44,19 +39,19 @@ public class PlayedStatus {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public User getFollower() {
+        return follower;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setFollower(User follower) {
+        this.follower = follower;
     }
 
-    public Episode getEpisode() {
-        return episode;
+    public User getFollowee() {
+        return followee;
     }
 
-    public void setEpisode(Episode episode) {
-        this.episode = episode;
+    public void setFollowee(User followee) {
+        this.followee = followee;
     }
 }
