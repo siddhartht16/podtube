@@ -10,7 +10,7 @@ import java.util.Date;
 //TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class AuditLog {
+public class ActivityLog {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
@@ -30,7 +30,7 @@ public class AuditLog {
 	@LastModifiedDate
 	private Date modifiedOn;
 
-	public AuditLog() {}
+	public ActivityLog() {}
 
 	public int getId() {
 		return id;

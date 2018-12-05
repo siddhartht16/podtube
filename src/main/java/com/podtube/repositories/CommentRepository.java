@@ -1,11 +1,11 @@
 package com.podtube.repositories;
 
-import com.podtube.models.Category;
+import com.podtube.models.Comment;
 import org.springframework.data.repository.CrudRepository;
 
 
 public interface CommentRepository
-	extends CrudRepository<Category, Integer> {
+	extends CrudRepository<Comment, Integer> {
 
 
 }

@@ -1,11 +1,11 @@
 package com.podtube.repositories;
 
-import com.podtube.models.Category;
+import com.podtube.models.ActivityLog;
 import org.springframework.data.repository.CrudRepository;
 
 
 public interface ActivityRepository
-	extends CrudRepository<Category, Integer> {
+	extends CrudRepository<ActivityLog, Integer> {
 
 
 }
