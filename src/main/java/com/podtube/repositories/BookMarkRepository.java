@@ -1,11 +1,9 @@
 package com.podtube.repositories;
 
-import com.podtube.models.Category;
+import com.podtube.models.Bookmark;
 import org.springframework.data.repository.CrudRepository;
 
 
 public interface BookMarkRepository
-	extends CrudRepository<Category, Integer> {
-
-
+	extends CrudRepository<Bookmark, Integer> {
 }

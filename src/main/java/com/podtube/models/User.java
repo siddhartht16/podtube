@@ -1,19 +1,55 @@
 package com.podtube.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.podtube.common.UserRoles;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
+//TODO : Add table name, column names
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
 
+	private UserRoles userRoles;
+
+	private String username;
+	private String password;
+	private String firstname;
+	private String lastname;
+	private String email;
+
+	@Transient
+	private long followers;
+
+	@Transient
+	private long followees;
+
+	// When a user searches for another user, show if the loggedin user is following the other user
+	@Transient
+	private boolean isFollowing;
+
+	// When a user searches for another user, show if the loggedin user is followed by the other user
+	@Transient
+	private boolean isFollowedBy;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "created_on", nullable = false, updatable = false)
+	@CreatedDate
+	private Date createdOn;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "modified_on", nullable = false)
+	@LastModifiedDate
+	private Date modifiedOn;
+
 	public User() {}
+
 	public int getId() {
 		return id;
 	}
@@ -28,13 +64,6 @@ public class User {
 	public void setUserRoles(UserRoles userRoles) {
 		this.userRoles = userRoles;
 	}
-
-	private UserRoles userRoles;
-
-	private String username;
-	private String password;
-	private String firstname;
-	private String lastname;
 
 	public String getUsername() {
 		return username;
@@ -76,29 +105,35 @@ public class User {
 		this.email = email;
 	}
 
-	private String email;
+	public long getFollowers() {
+		return followers;
+	}
 
-	@OneToMany(mappedBy = "user", cascade= CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<Comment> comments = new ArrayList<Comment>();
+	public void setFollowers(long followers) {
+		this.followers = followers;
+	}
 
-	@OneToMany(mappedBy = "user", cascade= CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<Playlist> playlists = new ArrayList<Playlist>();
+	public long getFollowees() {
+		return followees;
+	}
 
-	@OneToMany(mappedBy = "user", cascade= CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<Rating> ratings = new ArrayList<Rating>();
+	public void setFollowees(long followees) {
+		this.followees = followees;
+	}
 
-	@OneToMany(mappedBy = "user", cascade= CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<Bookmark> bookmarks = new ArrayList<Bookmark>();
+	public boolean isFollowing() {
+		return isFollowing;
+	}
 
-	@OneToMany(mappedBy = "user", cascade= CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<History> history = new ArrayList<History>();
+	public void setFollowing(boolean following) {
+		isFollowing = following;
+	}
 
-	//TODO: Define many to many for followers
+	public boolean isFollowedBy() {
+		return isFollowedBy;
+	}
 
-
+	public void setFollowedBy(boolean followedBy) {
+		isFollowedBy = followedBy;
+	}
 }

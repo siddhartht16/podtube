@@ -1,8 +1,5 @@
 package com.podtube.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -10,6 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
 
+//TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Category {
@@ -19,6 +17,21 @@ public class Category {
 
 	private String title;
 	private String tag;
+	private int tagUsage;
+	private String createdBy;
+	private String modifiedBy;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "created_on", nullable = false, updatable = false)
+	@CreatedDate
+	private Date createdOn;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "modified_on", nullable = false)
+	@LastModifiedDate
+	private Date modifiedOn;
+
+	public Category() {}
 
 	public int getTagUsage() {
 		return tagUsage;
@@ -28,9 +41,6 @@ public class Category {
 		this.tagUsage = tagUsage;
 	}
 
-	private int tagUsage;
-
-	public Category() {}
 
 	public String getTag() {
 		return tag;
@@ -54,30 +64,6 @@ public class Category {
 		this.title = title;
 	}
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "created_on", nullable = false, updatable = false)
-	@CreatedDate
-	private Date createdOn;
-
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "modified_on", nullable = false)
-	@LastModifiedDate
-	private Date modifiedOn;
-
-	//TODO: Add many to many for category and podcast
-
-
-	public Date getCreatedOn() {
-		return createdOn;
-	}
-
-	public Date getModifiedOn() {
-		return modifiedOn;
-	}
-
-	private String createdBy;
-	private String modifiedBy;
-
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -94,5 +80,17 @@ public class Category {
 		this.modifiedBy = modifiedBy;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Category cat = (Category) o;
+		return tag.equals(cat.tag);
+	}
+
+	@Override
+	public int hashCode() {
+		return tag.hashCode();
+	}
 
 }

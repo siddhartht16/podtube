@@ -1,11 +1,11 @@
 package com.podtube.repositories;
 
-import com.podtube.models.Category;
+import com.podtube.models.Playlist;
 import org.springframework.data.repository.CrudRepository;
 
 
 public interface PlaylistRepository
-	extends CrudRepository<Category, Integer> {
+	extends CrudRepository<Playlist, Integer> {
 
 
 }
