@@ -17,6 +17,7 @@ public class ActivityLog {
 
 	// TODO: Add join column field
 	@ManyToOne
+    @JoinColumn(name = "user_id")
 	private User user;
 	private String log;
 

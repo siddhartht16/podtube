@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 //TODO : Add table name, column names
 @Entity
@@ -15,6 +16,9 @@ public class User {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
+
+//	@OneToMany(mappedBy = "user")
+//	List<ActivityLog> activityLogs;
 
 	private UserRoles userRoles;
 

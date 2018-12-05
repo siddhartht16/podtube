@@ -13,8 +13,10 @@ import com.podtube.repositories.PodcastRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @CrossOrigin(origins="*", allowedHeaders = "*", allowCredentials = "true")
@@ -92,7 +94,9 @@ public class SyncService {
 			if(podcastForUrl==null){
 				//Add to database
 				Podcast podcast = new Podcast();
-				podcast.setCategory(category);
+				Set<Category> categorySet = new HashSet<>();
+				categorySet.add(category);
+				podcast.setCategories(categorySet);
 				podcast.setUrl(gPodderPodcast.getUrl());
 				podcast.setTitle(gPodderPodcast.getTitle());
 				podcast.setDescription(gPodderPodcast.getDescription());
@@ -168,7 +172,10 @@ public class SyncService {
 	public List<Podcast> syncPodcastsForCategory(@PathVariable("categoryId") int categoryId) {
 
 		this.syncPodcastsForCategoryFromGpodder(categoryId);
-		return (List<Podcast>) podcastRepository.findPodcastsByCategoryId(categoryId);
+		Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
+		return categoryOpt.map(category -> {
+			return podcastRepository.findPodcastsByCategoriesContaining(category);
+		}).orElseGet(() -> {return null;});
 	}
 
 	@PostMapping("/api/sync/podcasts/{podcastId}/episodes")

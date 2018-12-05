@@ -1,5 +1,6 @@
 package com.podtube.repositories;
 
+import com.podtube.models.Category;
 import com.podtube.models.Podcast;
 import org.springframework.data.repository.CrudRepository;
 
@@ -11,7 +12,6 @@ public interface PodcastRepository
 
 	Podcast findByUrlEquals(String url);
 
-	List<Podcast> findPodcastsByCategoryId(int categoryId);
-
+	List<Podcast> findPodcastsByCategoriesContaining(Category category);
 
 }

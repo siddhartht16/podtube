@@ -17,7 +17,14 @@ public class Podcast {
 	private int id;
 
 	// TODO: Add join table and join column fields
-	@ManyToMany
+	@ManyToMany(cascade = {
+			CascadeType.PERSIST,
+			CascadeType.MERGE
+	})
+//	@JoinTable(name = "category_podcasts",
+//			joinColumns = @JoinColumn(name = "podcast_id"),
+//			inverseJoinColumns = @JoinColumn(name = "category_id")
+//	)
 	private Set<Category> categories;
 
 	private String url;
