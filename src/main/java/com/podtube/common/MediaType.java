@@ -1,6 +1,6 @@
 package com.podtube.common;
 
-public enum MediaTypes {
+public enum MediaType {
     AUDIO,
     VIDEO
 }

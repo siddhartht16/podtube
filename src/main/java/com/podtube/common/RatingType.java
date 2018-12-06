@@ -4,7 +4,7 @@ package com.podtube.common;
  * Enum containing the possible types of clones
  */
 
-public enum RatingTypes {
+public enum RatingType {
     RATING_ONE_STAR,
     RATING_TWO_STAR,
     RATING_THIRD_STAR,

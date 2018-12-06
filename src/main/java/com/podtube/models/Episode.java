@@ -1,6 +1,6 @@
 package com.podtube.models;
 
-import com.podtube.common.MediaTypes;
+import com.podtube.common.MediaType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -48,8 +48,8 @@ public class Episode {
 	@JoinColumn(name = "podcast_id")
 	private Podcast podcast;
 
-	@Column(name = "media_types")
-	private MediaTypes mediaTypes;
+	@Column(name = "media_type")
+	private MediaType mediaType;
 
 	@Column(name = "title")
 	private String title;
@@ -140,12 +140,12 @@ public class Episode {
 		this.podcast = podcast;
 	}
 
-	public MediaTypes getMediaTypes() {
-		return mediaTypes;
+	public MediaType getMediaType() {
+		return mediaType;
 	}
 
-	public void setMediaTypes(MediaTypes mediaTypes) {
-		this.mediaTypes = mediaTypes;
+	public void setMediaTypes(MediaType mediaType) {
+		this.mediaType = mediaType;
 	}
 
 
@@ -231,13 +231,13 @@ public class Episode {
 		//Set media type based off enclosure type
 		switch (this.enclosureType.toLowerCase()) {
 			case GPODDER_MEDIA_TYPE_AUDIO:
-				this.setMediaTypes(MediaTypes.AUDIO);
+				this.setMediaTypes(MediaType.AUDIO);
 				break;
 			case GPODDER_MEDIA_TYPE_VIDEO:
-				this.setMediaTypes(MediaTypes.VIDEO);
+				this.setMediaTypes(MediaType.VIDEO);
 				break;
 			default:
-				this.setMediaTypes(MediaTypes.AUDIO);
+				this.setMediaTypes(MediaType.AUDIO);
 		}
 	}
 

@@ -26,10 +26,11 @@ public class Playlist {
 	private Set<Episode> episodes;
 
 	@ManyToOne
-	@JoinColumn(name = "user")
+	@JoinColumn(name = "user_id")
 	@JsonIgnore
 	private User user;
 
+	@Column(name = "title")
 	private String title;
 
 	@Temporal(TemporalType.TIMESTAMP)

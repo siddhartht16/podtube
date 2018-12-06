@@ -1,5 +1,6 @@
 package com.podtube.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.podtube.common.UserRole;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -7,11 +8,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
-//TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "user")
 public class User {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -25,25 +25,38 @@ public class User {
 		this.userRole = userRole;
 	}
 
+	@Column(name = "user_role")
 	private UserRole userRole;
 
+	@Column(name = "username")
 	private String username;
+
+	@JsonIgnore
+	@Column(name = "password")
 	private String password;
+
+	@Column(name = "firstname")
 	private String firstname;
+
+	@Column(name = "lastname")
 	private String lastname;
+
+	@Column(name = "email")
 	private String email;
 
 	@Transient
-	private long followers;
+	//This means the number of users following this user
+	private long followerCount;
 
 	@Transient
-	private long followees;
+	//This means the number of users this user follows
+	private long followeeCount;
 
-	// When a user searches for another user, show if the loggedin user is following the other user
+	//When a user views another user, show if the logged in user is following the viewed user
 	@Transient
 	private boolean isFollowing;
 
-	// When a user searches for another user, show if the loggedin user is followed by the other user
+	//When a user searches for another user, show if the viewed user follows the loggedin user
 	@Transient
 	private boolean isFollowedBy;
 
@@ -65,7 +78,6 @@ public class User {
 	public void setId(int id) {
 		this.id = id;
 	}
-
 
 	public String getUsername() {
 		return username;
@@ -107,22 +119,6 @@ public class User {
 		this.email = email;
 	}
 
-	public long getFollowers() {
-		return followers;
-	}
-
-	public void setFollowers(long followers) {
-		this.followers = followers;
-	}
-
-	public long getFollowees() {
-		return followees;
-	}
-
-	public void setFollowees(long followees) {
-		this.followees = followees;
-	}
-
 	public boolean isFollowing() {
 		return isFollowing;
 	}
@@ -137,5 +133,21 @@ public class User {
 
 	public void setFollowedBy(boolean followedBy) {
 		isFollowedBy = followedBy;
+	}
+
+	public long getFollowerCount() {
+		return followerCount;
+	}
+
+	public void setFollowerCount(long followerCount) {
+		this.followerCount = followerCount;
+	}
+
+	public long getFolloweeCount() {
+		return followeeCount;
+	}
+
+	public void setFolloweeCount(long followeeCount) {
+		this.followeeCount = followeeCount;
 	}
 }
