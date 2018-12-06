@@ -2,6 +2,7 @@ package com.podtube.repositories;
 
 import com.podtube.models.Category;
 import com.podtube.models.Podcast;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -12,6 +13,11 @@ public interface PodcastRepository
 
 	Podcast findByUrlEquals(String url);
 
-	List<Podcast> findPodcastsByCategoriesContaining(Category category);
-
+	@Query(value = "SELECT * FROM podcast p " +
+			"INNER JOIN " +
+			"podcast_categories pc " +
+			"ON p.id = pc.podcast_id " +
+			"WHERE " +
+			"pc.categories_id = ?1", nativeQuery = true)
+	List<Podcast> getPodcastsForCategory(int categoryId);
 }

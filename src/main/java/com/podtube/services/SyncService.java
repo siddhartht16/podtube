@@ -56,6 +56,9 @@ public class SyncService {
 				category.setTitle(gPodderCategory.getTitle());
 				category.setTag(gPodderCategory.getTag());
 				category.setTagUsage(gPodderCategory.getTagUsage());
+
+				//Add created by and modified by from session
+
 				categoryRepository.save(category);
 			}//if..
 		}//for..
@@ -73,7 +76,7 @@ public class SyncService {
 		//Get categories from GPodder
 		List<GPodderPodcast> gPodderPodcasts = apiUtils.getPodcastsForTag(category.getTag());
 
-		//
+		//Create new podcasts if not already present
 		for(GPodderPodcast gPodderPodcast: gPodderPodcasts){
 
 			//TODO: REVISIT THIS CRITERIA
@@ -93,18 +96,28 @@ public class SyncService {
 				//Add to database
 				Podcast podcast = new Podcast();
 
-				//podcast.setCategory(category);
+				//Set podcast fields
 				podcast.setUrl(gPodderPodcast.getUrl());
 				podcast.setTitle(gPodderPodcast.getTitle());
 				podcast.setDescription(gPodderPodcast.getDescription());
 				podcast.setLogo_url(gPodderPodcast.getLogoUrl());
 				podcast.setMygpo_link(gPodderPodcast.getMyGPOLink());
 				podcast.setScaled_logo_url(gPodderPodcast.getScaledLogoUrl());
-				podcast.setSubscribers(gPodderPodcast.getSubscribers());
-				podcast.setSubscribers_last_week(gPodderPodcast.getSubscribersLastWeek());
+				podcast.setGpodder_subscribers(gPodderPodcast.getSubscribers());
+				podcast.setGpodder_subscribers_last_week(gPodderPodcast.getSubscribersLastWeek());
 				podcast.setWebsite(gPodderPodcast.getWebsite());
+
+				//Set category
+				podcast.addCategory(category);
+
+				//Add created by and modified by from session
+
 				podcastRepository.save(podcast);
 			}//if..
+			else{
+				//Add this category to existing podcast
+				podcastForUrl.addCategory(category);
+			}
 		}//for..
 	}//syncPodcastsForCategoryFromGpodder..
 
@@ -165,17 +178,17 @@ public class SyncService {
 		return (List<Category>) categoryRepository.findAll();
 	}
 
-//	@PostMapping("/api/sync/categories/{categoryId}/podcasts")
-//	public List<Podcast> syncPodcastsForCategory(@PathVariable("categoryId") int categoryId) {
-//
-//		this.syncPodcastsForCategoryFromGpodder(categoryId);
-//		return (List<Podcast>) podcastRepository.findPodcastsByCategoryId(categoryId);
-//	}
+	@PostMapping("/api/sync/categories/{categoryId}/podcasts")
+	public List<Podcast> syncPodcastsForCategory(@PathVariable("categoryId") int categoryId) {
+
+		this.syncPodcastsForCategoryFromGpodder(categoryId);
+		return podcastRepository.getPodcastsForCategory(categoryId);
+	}
 
 	@PostMapping("/api/sync/podcasts/{podcastId}/episodes")
 	public List<Episode> syncEpisodesForPodcast(@PathVariable("podcastId") int podcastId) {
 
 		this.syncEpisodesForPodcastFromRSSFeed(podcastId);
-		return (List<Episode>) episodeRepository.findEpisodesByPodcastId(podcastId);
+		return episodeRepository.findEpisodesByPodcastId(podcastId);
 	}
 }
