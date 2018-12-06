@@ -22,4 +22,7 @@ public class CategoryService {
 
 		return (List<Category>) categoryRepository.findAll();
 	}
+
+
+
 }

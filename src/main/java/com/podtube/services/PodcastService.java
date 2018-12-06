@@ -21,4 +21,9 @@ public class PodcastService {
 		return (List<Podcast>) podcastRepository.findAll();
 	}
 
+	@GetMapping("/api/categories/categoryId/podcasts")
+	public List<Podcast> getPodcastsForCategory(@PathVariable("categoryId") int categoryId) {
+		return podcastRepository.getPodcastsForCategory(categoryId);
+	}
+
 }
