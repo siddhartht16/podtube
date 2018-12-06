@@ -1,5 +1,6 @@
 package com.podtube.models;
 
+import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -7,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
 
+@Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "follow_link")
@@ -30,28 +32,4 @@ public class FollowLink {
     @Column(name = "modified_on", nullable = false)
     @LastModifiedDate
     private Date modifiedOn;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public User getFollower() {
-        return follower;
-    }
-
-    public void setFollower(User follower) {
-        this.follower = follower;
-    }
-
-    public User getFollowee() {
-        return followee;
-    }
-
-    public void setFollowee(User followee) {
-        this.followee = followee;
-    }
 }

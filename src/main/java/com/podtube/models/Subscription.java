@@ -1,6 +1,7 @@
 package com.podtube.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
 
+@Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "subscription")
@@ -36,27 +38,4 @@ public class Subscription {
 	private Date modifiedOn;
 
 	public Subscription() {}
-
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public Podcast getPodcast() {
-		return podcast;
-	}
-
-	public void setPodcast(Podcast podcast) {
-		this.podcast = podcast;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
 }

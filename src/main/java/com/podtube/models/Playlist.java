@@ -1,15 +1,17 @@
 package com.podtube.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
-
+@Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "playlist")
@@ -23,7 +25,7 @@ public class Playlist {
 			joinColumns = @JoinColumn(name = "playlist_id"),
 			inverseJoinColumns = @JoinColumn(name = "episodes_id")
 	)
-	private Set<Episode> episodes;
+	private Set<Episode> episodes = new HashSet<>();
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -45,37 +47,11 @@ public class Playlist {
 
 	public Playlist() {}
 
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
+	public void addEpisode(Episode episode){
+		this.episodes.add(episode);
 	}
 
-	public String getTitle() {
-		return title;
+	public void removeEpisode(Episode episode){
+		this.episodes.remove(episode);
 	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public Set<Episode> getEpisodes() {
-		return episodes;
-	}
-
-	public void setEpisodes(Set<Episode> episodes) {
-		this.episodes = episodes;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	// TODO: Add add episode function
-
-	// TODO: Add remove episode function
 }
