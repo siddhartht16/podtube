@@ -92,7 +92,8 @@ public class SyncService {
 			if(podcastForUrl==null){
 				//Add to database
 				Podcast podcast = new Podcast();
-				podcast.setCategory(category);
+
+				//podcast.setCategory(category);
 				podcast.setUrl(gPodderPodcast.getUrl());
 				podcast.setTitle(gPodderPodcast.getTitle());
 				podcast.setDescription(gPodderPodcast.getDescription());
@@ -164,12 +165,12 @@ public class SyncService {
 		return (List<Category>) categoryRepository.findAll();
 	}
 
-	@PostMapping("/api/sync/categories/{categoryId}/podcasts")
-	public List<Podcast> syncPodcastsForCategory(@PathVariable("categoryId") int categoryId) {
-
-		this.syncPodcastsForCategoryFromGpodder(categoryId);
-		return (List<Podcast>) podcastRepository.findPodcastsByCategoryId(categoryId);
-	}
+//	@PostMapping("/api/sync/categories/{categoryId}/podcasts")
+//	public List<Podcast> syncPodcastsForCategory(@PathVariable("categoryId") int categoryId) {
+//
+//		this.syncPodcastsForCategoryFromGpodder(categoryId);
+//		return (List<Podcast>) podcastRepository.findPodcastsByCategoryId(categoryId);
+//	}
 
 	@PostMapping("/api/sync/podcasts/{podcastId}/episodes")
 	public List<Episode> syncEpisodesForPodcast(@PathVariable("podcastId") int podcastId) {

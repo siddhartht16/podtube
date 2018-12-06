@@ -7,19 +7,19 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
 
-//TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "activity_log")
 public class ActivityLog {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
 
-	// TODO: Add join column field
 	@ManyToOne
     @JoinColumn(name = "user_id")
 	private User user;
 
+	@Column(name = "log")
 	private String log;
 
 	@Temporal(TemporalType.TIMESTAMP)

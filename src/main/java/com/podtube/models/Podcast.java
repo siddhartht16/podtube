@@ -8,27 +8,47 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
 
-//TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "podcast")
 public class Podcast {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
 
-	// TODO: Add join table and join column fields
 	@ManyToMany
+	@JoinTable(name = "podcast_categories",
+			joinColumns = @JoinColumn(name = "podcast_id"),
+			inverseJoinColumns = @JoinColumn(name = "categories_id")
+	)
 	private Set<Category> categories;
 
+	@Column(name = "url")
 	private String url;
+
+	@Column(name = "title")
 	private String title;
+
+	@Column(name = "description")
 	@Lob
 	private String description;
+
+	@Column(name = "subscribers")
 	private int subscribers;
+
+	@Column(name = "subscribers_last_week")
 	private int subscribers_last_week;
+
+	@Column(name = "logo_url")
 	private String logo_url;
+
+	@Column(name = "scaled_logo_url")
 	private String scaled_logo_url;
+
+	@Column(name = "website")
 	private String website;
+
+	@Column(name = "mygpo_link")
 	private String mygpo_link;
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -41,8 +61,14 @@ public class Podcast {
 	@LastModifiedDate
 	private Date modifiedOn;
 
+	@Column(name = "created_by")
 	private String createdBy;
+
+	@Column(name = "modified_by")
 	private String modifiedBy;
+
+	@Column(name = "author")
+	private String author;
 
 	@Transient
 	private boolean isSubscribed;
@@ -65,7 +91,6 @@ public class Podcast {
 		this.id = id;
 	}
 
-
 	public Date getCreatedOn() {
 		return createdOn;
 	}
@@ -73,10 +98,6 @@ public class Podcast {
 	public Date getModifiedOn() {
 		return modifiedOn;
 	}
-
-
-	//Read from episode data
-	private String author;
 
 	public String getAuthor() {
 		return author;

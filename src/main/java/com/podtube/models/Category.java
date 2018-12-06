@@ -7,18 +7,27 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
 
-//TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "category")
 public class Category {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
 
+	@Column(name = "title")
 	private String title;
+
+	@Column(name = "tag")
 	private String tag;
+
+	@Column(name = "tag_usage")
 	private int tagUsage;
+
+	@Column(name = "created_by")
 	private String createdBy;
+
+	@Column(name = "modified_by")
 	private String modifiedBy;
 
 	@Temporal(TemporalType.TIMESTAMP)

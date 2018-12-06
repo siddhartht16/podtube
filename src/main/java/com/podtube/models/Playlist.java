@@ -9,20 +9,24 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
 
-//TODO : Add table name, column names
+
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "playlist")
 public class Playlist {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
 
-	// TODO: Add join table and join column fields
 	@ManyToMany
+	@JoinTable(name = "playlist_episodes",
+			joinColumns = @JoinColumn(name = "playlist_id"),
+			inverseJoinColumns = @JoinColumn(name = "episodes_id")
+	)
 	private Set<Episode> episodes;
 
-	// TODO: Add join column field
 	@ManyToOne
+	@JoinColumn(name = "user")
 	@JsonIgnore
 	private User user;
 
