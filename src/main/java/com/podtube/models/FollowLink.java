@@ -7,18 +7,18 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
 
-//TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "follow_link")
 public class FollowLink {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
 
-    // TODO: Add join column field
+    @JoinColumn(name = "follower_id")
     @ManyToOne User follower;
 
-    // TODO: Add join column field
+    @JoinColumn(name = "followee_id")
     @ManyToOne User followee;
 
     @Temporal(TemporalType.TIMESTAMP)

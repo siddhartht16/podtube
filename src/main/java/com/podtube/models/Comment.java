@@ -11,20 +11,22 @@ import java.util.Date;
 //TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "comment")
 public class Comment {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
 
-	// TODO: Add join column field
 	@ManyToOne
+	@JoinColumn(name = "user_id")
 	private User user;
 
-	// TODO: Add join column field
 	@ManyToOne
+	@JoinColumn(name = "podcast_id")
 	@JsonIgnore
 	private Podcast podcast;
 
+	@Column(name = "comment")
 	@Lob
 	private String comment;
 

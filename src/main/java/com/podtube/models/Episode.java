@@ -13,6 +13,7 @@ import static com.podtube.common.AppConstants.*;
 //TODO : Add table name, column names
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "episode")
 public class Episode {
 
 	//	{
@@ -42,28 +43,54 @@ public class Episode {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
+
 	@ManyToOne
+	@JoinColumn(name = "podcast_id")
 	private Podcast podcast;
+
+	@Column(name = "media_types")
 	private MediaTypes mediaTypes;
 
+	@Column(name = "title")
 	private String title;
+
+	@Column(name = "pub_date")
 	private Date pubDate;
+
+	@Column(name = "link")
 	private String link;
+
+	@Column(name = "guid")
 	private String guid;
+
+	@Column(name = "author")
 	private String author;
+
+	@Column(name = "thumbnail")
 	private String thumbnail;
 
+	@Column(name = "description")
 	@Lob
 	private String description;
 
+	@Column(name = "content")
 	@Lob
 	private String content;
 
 	//TODO: Consider scenarios where this may not have the media link, check in other places
+	@Column(name = "enclosure_link")
 	private String enclosureLink;
+
+	@Column(name = "enclosure_type")
 	private String enclosureType;
+
+	@Column(name = "enclosure_length")
 	private Long enclosureLength;
+
+	@Column(name = "enclosure_duration")
 	private Long enclosureDuration;
+
+	@Column(name = "enclosure_thumbnail")
 	private String enclosureThumbnail;
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -76,7 +103,10 @@ public class Episode {
 	@LastModifiedDate
 	private Date modifiedOn;
 
+	@Column(name = "created_by")
 	private String createdBy;
+
+	@Column(name = "modified_by")
 	private String modifiedBy;
 
 	@Transient
