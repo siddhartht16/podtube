@@ -65,4 +65,12 @@ public class User {
 	private Date modifiedOn;
 
 	public User() {}
+
+	public void setUserRole(UserRole userRole) {
+		this.userRole = userRole;
+	}
+
+	public int getId() {
+		return id;
+	}
 }
