@@ -15,7 +15,7 @@ import java.util.Date;
 public class ActivityLog {
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
-	private int id;
+	private int id;	
 
 	@ManyToOne
     @JoinColumn(name = "user_id")

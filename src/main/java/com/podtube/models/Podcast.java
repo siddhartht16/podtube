@@ -150,4 +150,8 @@ public class Podcast {
 	public void setAuthor(String author) {
 		this.author = author;
 	}
+
+	public void setSubscribed(boolean subscribed) {
+		isSubscribed = subscribed;
+	}
 }

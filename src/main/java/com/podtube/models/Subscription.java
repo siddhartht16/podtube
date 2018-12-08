@@ -38,4 +38,16 @@ public class Subscription {
 	private Date modifiedOn;
 
 	public Subscription() {}
+
+	public void setPodcast(Podcast podcast) {
+		this.podcast = podcast;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Podcast getPodcast() {
+		return podcast;
+	}
 }
