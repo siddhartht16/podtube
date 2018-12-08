@@ -73,4 +73,24 @@ public class User {
 	public int getId() {
 		return id;
 	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public String getEmail() {
+		return email;
+	}
 }
