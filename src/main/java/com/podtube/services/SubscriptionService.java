@@ -3,7 +3,6 @@ package com.podtube.services;
 import com.podtube.repositories.PodcastRepository;
 import com.podtube.repositories.SubscriptionRepository;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,13 +24,13 @@ public class SubscriptionService {
 	UserRepository userRepository;
 	@Autowired
 	PodcastRepository podcastRepository;
-	
+
 	@GetMapping("/api/subscription")
 	public ResponseEntity<List<Subscription>> findAllUserSubscriptions(HttpSession httpSession) {
 		if (!ServiceUtils.isValidSession(httpSession))
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		int id = (int) httpSession.getAttribute("id");
-		return new ResponseEntity<>(subscriptionRepository.findSubsriptionsByUser_IdAndOrderByCreatedOnDesc(id), HttpStatus.OK);
+		return new ResponseEntity<>(subscriptionRepository.findAllByUser_IdOrderByCreatedOnDesc(id), HttpStatus.OK);
 	}
 
 	@PostMapping("/api/subscription/podcast/{podcastId}")
@@ -45,6 +44,8 @@ public class SubscriptionService {
 			Optional<Podcast> podcastOpt = podcastRepository.findById(podcastId);
 			if(!podcastOpt.isPresent()) return new ResponseEntity<Podcast>(HttpStatus.BAD_REQUEST);
 			Podcast podcast = podcastOpt.get();
+			Subscription existingSubscription = subscriptionRepository.findByUserAndPodcastOrderByCreatedOnDesc(user, podcast);
+			if (existingSubscription != null) return new ResponseEntity<Podcast>(HttpStatus.BAD_REQUEST);
 			Subscription subscription = new Subscription();
 			subscription.setPodcast(podcast);
 			subscription.setUser(user);
@@ -65,7 +66,7 @@ public class SubscriptionService {
 			Optional<Podcast> podcastOpt = podcastRepository.findById(podcastId);
 			if(!podcastOpt.isPresent()) return new ResponseEntity<Podcast>(HttpStatus.BAD_REQUEST);
 			Podcast podcast = podcastOpt.get();
-			Subscription subscriptionToDelete = subscriptionRepository.findByUserAndPodcastAndOrderByCreatedOnDesc(user, podcast);
+			Subscription subscriptionToDelete = subscriptionRepository.findByUserAndPodcastOrderByCreatedOnDesc(user, podcast);
 			if (subscriptionToDelete == null){
 				return new ResponseEntity<Podcast>(HttpStatus.BAD_REQUEST);
 			}
