@@ -3,76 +3,83 @@ package com.podtube.services;
 import com.podtube.models.User;
 import com.podtube.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins="*", allowedHeaders = "*", allowCredentials = "true")
 public class UserService {
+
 	@Autowired
 	UserRepository userRepository;
 
-	@GetMapping("/api/users")
-	public List<User> findAllUsers() {
-
-		return (List<User>) userRepository.findAll();
-	}
-
-	@GetMapping("/api/user/{userId}")
-	public User findUserById(
-			@PathVariable("userId") int userId
-			) {
-		return userRepository.findById(userId).get();
-	}
-
-	@PostMapping("/api/users")
-	public List<User> createUser(@RequestBody User user) {
-		userRepository.save(user);
-		return (List<User>) userRepository.findAll();
-	}
-	
 	@PostMapping("/api/register")
-	public User register(@RequestBody User user, HttpSession session) {
-		session.setAttribute("currentUser", user);
-		userRepository.save(user);
-		return user;
+	public ResponseEntity<User> register(@RequestBody User user, HttpSession httpSession) {
+		List<User> users = userRepository.findUserByUsername(user.getUsername());
+		if (!users.isEmpty())
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		User userToAdd = new User(user.getUsername(), user.getPassword());
+		User newUser = userRepository.save(userToAdd);
+		httpSession.setAttribute("id", newUser.getId());
+		return new ResponseEntity<>(newUser, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/api/profile")
-	public User profile(HttpSession session) {
-		User currentUser = (User)session.getAttribute("currentUser");
-		return userRepository.findById(currentUser.getId()).get();
+	public ResponseEntity<User> profile(HttpSession httpSession) {
+		if (httpSession.getAttribute("id") == null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		int id = (int) httpSession.getAttribute("id");
+		Optional<User> userOpt = userRepository.findById(id);
+
+		return userOpt.map(user -> new ResponseEntity<>(user, HttpStatus.OK))
+				.orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+	}
+
+	@GetMapping("/api/users")
+	public ResponseEntity<List<User>> findAllUsers(HttpSession httpSession) {
+		if (httpSession.getAttribute("id") == null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>((List<User>) userRepository.findAll(), HttpStatus.OK);
+	}
+
+	@PostMapping("/api/login")
+	public ResponseEntity<User> login(@RequestBody User credentials, HttpSession httpSession) {
+		List<User> users = userRepository.findUserByCredentials(credentials.getUsername(), credentials.getPassword());
+		if (!users.isEmpty()){
+			User userToReturn = users.get(0);
+			httpSession.setAttribute("id", userToReturn.getId());
+			return new ResponseEntity<>(userToReturn, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	@PostMapping("/api/logout")
+	public void logout(HttpSession httpSession) {
+		httpSession.invalidate();
 	}
 
 	@PutMapping("/api/profile")
-	public User profile(HttpSession session,
-                        @RequestBody User user) {
+	public ResponseEntity<User> updateProfile(@RequestBody User profile, HttpSession httpSession) {
+		if (httpSession.getAttribute("id") == null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		int id = (int) httpSession.getAttribute("id");
+		Optional<User> userOpt = userRepository.findById(id);
 
-		User currentUser = (User)session.getAttribute("currentUser");
-		User userToUpdate = userRepository.findById(currentUser.getId()).get();
-//		userToUpdate.setFirstName(user.getFirstName());
-//		userToUpdate.setLastName(user.getLastName());
-//		userToUpdate.setDateOfBirth(user.getDateOfBirth());
-//		userToUpdate.setPhoneNumber(user.getPhoneNumber());
-//		userToUpdate.setEmail(user.getEmail());
-//		userToUpdate.setRole(user.getRole());
-		userToUpdate = userRepository.save(userToUpdate);
-		return userToUpdate;
+		return userOpt.map(user -> {
+			if (!"".equals(profile.getFirstName())) user.setFirstName(profile.getFirstName());
+			if (!"".equals(profile.getLastName())) user.setLastName(profile.getLastName());
+			if (!"".equals(profile.getPhone())) user.setPhone(profile.getPhone());
+			if (!"".equals(profile.getEmail())) user.setEmail(profile.getEmail());
+			user.setRole(profile.getRole());
+			if (!"".equals(profile.getDateOfBirth())) user.setDateOfBirth(profile.getDateOfBirth());
+			user = userRepository.save(user);
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
 	}
 
-
-	@PostMapping("/api/logout")
-	public void logout(HttpSession session) {
-		session.invalidate();
-	}
-	
-//	@PostMapping("/api/login")
-//	public User login(@RequestBody User credentials, HttpSession session) {
-//
-//		User user = userRepository.findByUsernameAndPassword(credentials.getUsername(), credentials.getPassword());
-//	    session.setAttribute("currentUser", user);
-//	    return user;
-//	}
 }

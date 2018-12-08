@@ -125,4 +125,56 @@ public class Episode {
 	public int hashCode() {
 		return link.hashCode();
 	}
+
+	public void setPodcast(Podcast podcast) {
+		this.podcast = podcast;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setPubDate(Date pubDate) {
+		this.pubDate = pubDate;
+	}
+
+	public void setLink(String link) {
+		this.link = link;
+	}
+
+	public void setGuid(String guid) {
+		this.guid = guid;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public void setEnclosureLink(String enclosureLink) {
+		this.enclosureLink = enclosureLink;
+	}
+
+	public void setEnclosureLength(Long enclosureLength) {
+		this.enclosureLength = enclosureLength;
+	}
+
+	public void setEnclosureDuration(Long enclosureDuration) {
+		this.enclosureDuration = enclosureDuration;
+	}
+
+	public void setEnclosureThumbnail(String enclosureThumbnail) {
+		this.enclosureThumbnail = enclosureThumbnail;
+	}
 }
