@@ -21,7 +21,7 @@ public class AdminService {
     public ResponseEntity<List<User>> findAllUsers(HttpSession httpSession) {
 
         if (!ServiceUtils.isValidSession(httpSession))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         //TODO: Check for if logged in user is admin
 
@@ -33,7 +33,7 @@ public class AdminService {
             @PathVariable("userId") int userId
     ) {
         if (!ServiceUtils.isValidSession(httpSession))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         //TODO: Check for if logged in user is admin
 
@@ -51,7 +51,7 @@ public class AdminService {
                                            @RequestBody User user) {
 
         if (!ServiceUtils.isValidSession(httpSession))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         //TODO: Check for if logged in user is admin
 
@@ -75,7 +75,7 @@ public class AdminService {
                 UserRole.ADMIN);
 
         if(userToLogIn==null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         httpSession.setAttribute("id", userToLogIn.getId());

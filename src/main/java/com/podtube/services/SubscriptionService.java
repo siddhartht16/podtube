@@ -29,16 +29,16 @@ public class SubscriptionService {
 	@GetMapping("/api/subscription")
 	public ResponseEntity<List<Subscription>> findAllUserSubscriptions(HttpSession httpSession) {
 		if (!ServiceUtils.isValidSession(httpSession))
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		int id = (int) httpSession.getAttribute("id");
-		return new ResponseEntity<>(subscriptionRepository.findSubsriptionsByUser_Id(id), HttpStatus.OK);
+		return new ResponseEntity<>(subscriptionRepository.findSubsriptionsByUser_IdAndOrderByCreatedOnDesc(id), HttpStatus.OK);
 	}
 
 	@PostMapping("/api/subscription/podcast/{podcastId}")
 	public ResponseEntity<Podcast> createSubscription(HttpSession httpSession,
 													  @PathVariable("podcastId") int podcastId) {
 		if (!ServiceUtils.isValidSession(httpSession))
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		int id = (int) httpSession.getAttribute("id");
 		Optional<User> userOpt = userRepository.findById(id);
 		return userOpt.map(user -> {
@@ -58,14 +58,14 @@ public class SubscriptionService {
 	public ResponseEntity<Podcast> cancelSubscription(HttpSession httpSession,
 													  @PathVariable("podcastId") int podcastId) {
 		if (!ServiceUtils.isValidSession(httpSession))
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		int id = (int) httpSession.getAttribute("id");
 		Optional<User> userOpt = userRepository.findById(id);
 		return userOpt.map(user -> {
 			Optional<Podcast> podcastOpt = podcastRepository.findById(podcastId);
 			if(!podcastOpt.isPresent()) return new ResponseEntity<Podcast>(HttpStatus.BAD_REQUEST);
 			Podcast podcast = podcastOpt.get();
-			Subscription subscriptionToDelete = subscriptionRepository.findByUserAndPodcast(user, podcast);
+			Subscription subscriptionToDelete = subscriptionRepository.findByUserAndPodcastAndOrderByCreatedOnDesc(user, podcast);
 			if (subscriptionToDelete == null){
 				return new ResponseEntity<Podcast>(HttpStatus.BAD_REQUEST);
 			}

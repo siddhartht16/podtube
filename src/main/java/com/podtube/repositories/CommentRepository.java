@@ -11,8 +11,8 @@ import java.util.List;
 public interface CommentRepository
 	extends CrudRepository<Comment, Integer> {
 
-	List<Comment> findCommentsByPodcast(Podcast podcast);
+	List<Comment> findCommentsByPodcastAndOrderByCreatedOnDesc(Podcast podcast);
 
-	List<Comment> findCommentsByUser(User user);
+	List<Comment> findCommentsByUserAndOrderByCreatedOnDesc(User user);
 
 }

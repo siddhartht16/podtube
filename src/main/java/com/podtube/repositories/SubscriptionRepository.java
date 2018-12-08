@@ -12,8 +12,7 @@ import org.springframework.data.repository.CrudRepository;
 public interface SubscriptionRepository
 	extends CrudRepository<Subscription, Integer> {
 	
-	List<Subscription> findSubsriptionsByUser_Id(int userId);
+	List<Subscription> findSubsriptionsByUser_IdAndOrderByCreatedOnDesc(int userId);
 
-	Subscription findByUserAndPodcast(User user, Podcast podcast);
-
+	Subscription findByUserAndPodcastAndOrderByCreatedOnDesc(User user, Podcast podcast);
 }

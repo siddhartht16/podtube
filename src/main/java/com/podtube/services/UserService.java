@@ -37,7 +37,7 @@ public class UserService {
 	public ResponseEntity<User> profile(HttpSession httpSession) {
 
 		if (!ServiceUtils.isValidSession(httpSession))
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
 		//TODO: Check for if logged in user is normal user
 
@@ -52,7 +52,7 @@ public class UserService {
 	public ResponseEntity<List<User>> findAllUsers(HttpSession httpSession) {
 
 		if (!ServiceUtils.isValidSession(httpSession))
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
 		//TODO: Check for if logged in user is normal user
 
@@ -68,7 +68,7 @@ public class UserService {
 				UserRole.USER);
 
 		if(userToLogIn==null){
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 
 		httpSession.setAttribute("id", userToLogIn.getId());
@@ -84,7 +84,7 @@ public class UserService {
 	public ResponseEntity<User> updateProfile(@RequestBody User user, HttpSession httpSession) {
 
 		if (!ServiceUtils.isValidSession(httpSession))
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
 		//TODO: Check for if logged in user is normal user
 

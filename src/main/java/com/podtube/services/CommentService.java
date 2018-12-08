@@ -31,7 +31,7 @@ public class CommentService {
 		Optional<Podcast> podcastOpt = podcastRepository.findById(podcastId);
 		if(!podcastOpt.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		Podcast podcast = podcastOpt.get();
-		return new ResponseEntity<>(commentRepository.findCommentsByPodcast(podcast), HttpStatus.OK);
+		return new ResponseEntity<>(commentRepository.findCommentsByPodcastAndOrderByCreatedOnDesc(podcast), HttpStatus.OK);
 	}
 
 	@GetMapping("/api/user/{userId}/comment")
@@ -39,108 +39,62 @@ public class CommentService {
 		Optional<User> userOpt = userRepository.findById(userId);
 		if(!userOpt.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		User user = userOpt.get();
-		return new ResponseEntity<>(commentRepository.findCommentsByUser(user), HttpStatus.OK);
+		return new ResponseEntity<>(commentRepository.findCommentsByUserAndOrderByCreatedOnDesc(user), HttpStatus.OK);
 	}
 
 	@PostMapping("/api/podcast/{podcastId}/comment")
 	ResponseEntity<Comment> createComment(HttpSession httpSession,
 										  @PathVariable("podcastId") int podcastId,
 										  @RequestBody Comment comment) {
+        // check LoggedIn
 		if (!ServiceUtils.isValidSession(httpSession))
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        // check if user with id exists
 		int id = (int) httpSession.getAttribute("id");
 		Optional<User> userOpt = userRepository.findById(id);
 		if (!userOpt.isPresent()) new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
 		User user = userOpt.get();
+
+        // check if podcastId exists
 		Optional<Podcast> podcastOpt = podcastRepository.findById(podcastId);
 		if (!podcastOpt.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+		// create comment
 		Podcast podcast = podcastOpt.get();
 		comment.setPodcast(podcast);
 		comment.setUser(user);
 		return new ResponseEntity<>(commentRepository.save(comment), HttpStatus.OK);
 	}
+
+
+	@DeleteMapping("/api/comment/{commentId}")
+	ResponseEntity<List<Comment>> deleteComment(HttpSession httpSession,
+												@PathVariable("commentId") int commentId) {
+	    // check LoggedIn
+        if (!ServiceUtils.isValidSession(httpSession))
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        // check if user with id exists
+        int id = (int) httpSession.getAttribute("id");
+        Optional<User> userOpt = userRepository.findById(id);
+        if (!userOpt.isPresent()) new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        User user = userOpt.get();
+
+        // check if commentId exists
+        Optional<Comment> commentOpt = commentRepository.findById(commentId);
+        if (!commentOpt.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        // check if comment is owned by logged in user
+        Comment comment = commentOpt.get();
+        if (comment.getUser().getId() != user.getId()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        // delete comment
+        Podcast podcast = comment.getPodcast();
+        commentRepository.delete(comment);
+        List<Comment> comments = commentRepository.findCommentsByPodcastAndOrderByCreatedOnDesc(podcast);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
+	}
 }
-
-/*public class CourseService {
-
-	@Autowired
-	UserRepository userRepository;
-	@Autowired
-	CourseRepository courseRepository;
-
-	@PostMapping("/api/course")
-	public ResponseEntity<List<Course>> createCourse(@RequestBody Course course, HttpSession httpSession) {
-		if (httpSession.getAttribute("id") == null)
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		Course newCourse = new Course(course.getTitle());
-		int id = (int) httpSession.getAttribute("id");
-		Optional<User> userOpt = userRepository.findById(id);
-
-		return userOpt.map(user -> {
-			newCourse.setUser(user);
-			Course addedCourse = courseRepository.save(newCourse);
-			return new ResponseEntity<>(addedCourse.getUser().getCourses(), HttpStatus.OK);
-		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
-	}
-
-	@GetMapping("/api/courses")
-	public ResponseEntity<List<Course>> findAllCourses(HttpSession httpSession) {
-		if (httpSession.getAttribute("id") == null)
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		int id = (int) httpSession.getAttribute("id");
-		Optional<User> userOpt = userRepository.findById(id);
-
-		return userOpt.map(user -> new ResponseEntity<>(user.getCourses(), HttpStatus.OK))
-				.orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST))  ;
-	}
-
-	@GetMapping("/api/course/{cid}")
-	public ResponseEntity<Course> findCourseById(@PathVariable int cid, HttpSession httpSession) {
-		if (httpSession.getAttribute("id") == null)
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		int id = (int) httpSession.getAttribute("id");
-
-		Optional<Course> courseOpt = courseRepository.findById(cid);
-
-		return courseOpt.filter(course -> course.retrieveUserId() == id)
-				.map(course -> new ResponseEntity<>(course, HttpStatus.OK))
-				.orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
-	}
-
-	@PutMapping("/api/course/{cid}")
-	public ResponseEntity<Course> updateCourse(@PathVariable int cid,
-											   @RequestBody Course updatedCourse,
-											   HttpSession httpSession) {
-		if (httpSession.getAttribute("id") == null)
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		int id = (int) httpSession.getAttribute("id");
-
-		Optional<Course> courseOpt = courseRepository.findById(cid);
-
-		return courseOpt.filter(course -> course.retrieveUserId() == id)
-				.map(course -> {
-					course.setTitle(updatedCourse.getTitle());
-					course = courseRepository.save(course);
-					return new ResponseEntity<>(course, HttpStatus.OK);
-				}).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
-	}
-
-	@DeleteMapping("/api/course/{cid}")
-	public ResponseEntity<List<Course>> deleteCourse(@PathVariable int cid, HttpSession httpSession) {
-		if (httpSession.getAttribute("id") == null)
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		int id = (int) httpSession.getAttribute("id");
-
-		Optional<Course> courseOpt = courseRepository.findById(cid);
-
-		return courseOpt.filter(course -> course.retrieveUserId() == id)
-				.map(course -> {
-					courseRepository.delete(course);
-
-					// user must exist since if we are here then filter must have succeeded
-					User user = userRepository.findById(id).get();
-					return new ResponseEntity<>(user.getCourses(), HttpStatus.OK);
-				})
-				.orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
-	}
-}*/
