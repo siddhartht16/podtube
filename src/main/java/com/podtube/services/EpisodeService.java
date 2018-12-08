@@ -5,6 +5,8 @@ import com.podtube.models.Episode;
 import com.podtube.models.Podcast;
 import com.podtube.repositories.EpisodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,24 +21,25 @@ public class EpisodeService {
 	@Autowired
 	EpisodeRepository episodeRepository;
 
-	@GetMapping("/api/episodes")
-	public List<Episode> findAllEpisodes() {
-		return (List<Episode>) episodeRepository.findAll();
-	}
+//	@GetMapping("/api/episodes")
+//	public ResponseEntity<List<Episode>> findAllEpisodes() {
+//
+//		return new ResponseEntity<>((List<Episode>) episodeRepository.findAll(), HttpStatus.OK);
+//	}
 
 	@GetMapping("/api/podcasts/{podcastId}/episodes")
-	public List<Episode> getEpisodesForPodcasts(@PathVariable("podcastId") int podcastId) {
-		return episodeRepository.findEpisodesByPodcastId(podcastId);
+	public ResponseEntity<List<Episode>>  getEpisodesForPodcasts(@PathVariable("podcastId") int podcastId) {
+		return new ResponseEntity<>(episodeRepository.findEpisodesByPodcastId(podcastId), HttpStatus.OK);
 	}
 
 	@GetMapping("/api/episodes/{episodeId}")
-	public Episode getEpisode(@PathVariable("episodeId") int episodeId) {
+	public ResponseEntity<Episode> getEpisode(@PathVariable("episodeId") int episodeId) {
 
 		Optional<Episode> data = episodeRepository.findById(episodeId);
-		if(data.isPresent()){
+		if (data.isPresent()) {
 			Episode episode = data.get();
-			return episode;
+			return new ResponseEntity<>(episode, HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 }

@@ -4,6 +4,8 @@ import com.podtube.models.Category;
 import com.podtube.models.Podcast;
 import com.podtube.repositories.PodcastRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -17,26 +19,24 @@ public class PodcastService {
 	PodcastRepository podcastRepository;
 
 	@GetMapping("/api/podcasts")
-	public List<Podcast> findAllPodcasts() {
+	public ResponseEntity<List<Podcast>> findAllPodcasts() {
 
-		return (List<Podcast>) podcastRepository.findAll();
+		return new ResponseEntity<>((List<Podcast>) podcastRepository.findAll(), HttpStatus.OK);
 	}
 
 	@GetMapping("/api/categories/{categoryId}/podcasts")
-	public List<Podcast> getPodcastsForCategory(@PathVariable("categoryId") int categoryId) {
-		return podcastRepository.getPodcastsForCategory(categoryId);
+	public ResponseEntity<List<Podcast>>  getPodcastsForCategory(@PathVariable("categoryId") int categoryId) {
+		return new ResponseEntity<>(podcastRepository.getPodcastsForCategory(categoryId), HttpStatus.OK);
 	}
 
 	@GetMapping("/api/podcasts/{podcastId}")
-	public Podcast getPodcast(@PathVariable("podcastId") int podcastId) {
+	public ResponseEntity<Podcast> getPodcast(@PathVariable("podcastId") int podcastId) {
 
 		Optional<Podcast> data = podcastRepository.findById(podcastId);
 		if(data.isPresent()){
 			Podcast podcast = data.get();
-			return podcast;
+			return new ResponseEntity<>(podcast, HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
-
-
 }

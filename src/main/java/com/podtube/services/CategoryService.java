@@ -23,9 +23,9 @@ public class CategoryService {
 	CategoryRepository categoryRepository;
 
 	@GetMapping("/api/categories")
-	public List<Category> getAllCategories() {
+	public ResponseEntity<List<Category>> getAllCategories() {
 
-		return (List<Category>) categoryRepository.findAll();
+		return new ResponseEntity<>((List<Category>) categoryRepository.findAll(), HttpStatus.OK);
 	}
 
 //	@GetMapping("/api/categories")
@@ -38,14 +38,13 @@ public class CategoryService {
 //	}
 
 	@GetMapping("/api/categories/{categoryId}")
-	public Category getCategory(@PathVariable("categoryId") int categoryId) {
+	public ResponseEntity<Category> getCategory(@PathVariable("categoryId") int categoryId) {
 
 		Optional<Category> data = categoryRepository.findById(categoryId);
 		if(data.isPresent()){
 			Category category = data.get();
-			return category;
+			return new ResponseEntity<>(category, HttpStatus.OK);
 		}
-		return null;
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
-
 }
