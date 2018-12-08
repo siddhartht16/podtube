@@ -2,7 +2,10 @@ package com.podtube.services;
 
 import com.podtube.models.Category;
 import com.podtube.models.Podcast;
+import com.podtube.models.User;
 import com.podtube.repositories.PodcastRepository;
+import com.podtube.repositories.SubscriptionRepository;
+import com.podtube.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,10 @@ import java.util.Optional;
 public class PodcastService {
 	@Autowired
 	PodcastRepository podcastRepository;
+	@Autowired
+	SubscriptionRepository subscriptionRepository;
+	@Autowired
+	UserRepository userRepository;
 
 	@GetMapping("/api/podcasts")
 	public ResponseEntity<List<Podcast>> findAllPodcasts() {
@@ -25,7 +32,22 @@ public class PodcastService {
 	}
 
 	@GetMapping("/api/categories/{categoryId}/podcasts")
-	public ResponseEntity<List<Podcast>>  getPodcastsForCategory(@PathVariable("categoryId") int categoryId) {
+	public ResponseEntity<List<Podcast>>  getPodcastsForCategory(HttpSession httpSession,
+																 @PathVariable("categoryId") int categoryId) {
+		int id = 0;
+		if (httpSession.getAttribute("id") != null)
+			id = (int) httpSession.getAttribute("id");
+
+		List<Podcast> podcasts = podcastRepository.getPodcastsForCategory(categoryId);
+		if (id != 0) {
+			Optional<User> userOpt = userRepository.findById(id);
+			if (!userOpt.isPresent()) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+			User user = userOpt.get();
+			for (Podcast podcast : podcasts) {
+				if (subscriptionRepository.findByUserAndPodcastOrderByCreatedOnDesc(user, podcast) != null)
+					podcast.setSubscribed(true);
+			}
+		}
 		return new ResponseEntity<>(podcastRepository.getPodcastsForCategory(categoryId), HttpStatus.OK);
 	}
 
