@@ -154,4 +154,8 @@ public class Podcast {
 	public void setSubscribed(boolean subscribed) {
 		isSubscribed = subscribed;
 	}
+
+	public int getId() {
+		return id;
+	}
 }

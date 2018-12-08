@@ -31,7 +31,7 @@ public class CommentService {
 		Optional<Podcast> podcastOpt = podcastRepository.findById(podcastId);
 		if(!podcastOpt.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		Podcast podcast = podcastOpt.get();
-		return new ResponseEntity<>(commentRepository.findCommentsByPodcastAndOrderByCreatedOnDesc(podcast), HttpStatus.OK);
+		return new ResponseEntity<>(commentRepository.findCommentsByPodcast_IdAndOrderByCreatedOnDesc(podcast.getId()), HttpStatus.OK);
 	}
 
 	@GetMapping("/api/user/{userId}/comment")
@@ -39,7 +39,7 @@ public class CommentService {
 		Optional<User> userOpt = userRepository.findById(userId);
 		if(!userOpt.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		User user = userOpt.get();
-		return new ResponseEntity<>(commentRepository.findCommentsByUserAndOrderByCreatedOnDesc(user), HttpStatus.OK);
+		return new ResponseEntity<>(commentRepository.findCommentsByUser_IdAndOrderByCreatedOnDesc(user.getId()), HttpStatus.OK);
 	}
 
 	@PostMapping("/api/podcast/{podcastId}/comment")
@@ -94,7 +94,7 @@ public class CommentService {
         // delete comment
         Podcast podcast = comment.getPodcast();
         commentRepository.delete(comment);
-        List<Comment> comments = commentRepository.findCommentsByPodcastAndOrderByCreatedOnDesc(podcast);
+        List<Comment> comments = commentRepository.findCommentsByPodcast_IdAndOrderByCreatedOnDesc(podcast.getId());
         return new ResponseEntity<>(comments, HttpStatus.OK);
 	}
 }
