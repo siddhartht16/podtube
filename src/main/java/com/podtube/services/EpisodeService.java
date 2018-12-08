@@ -22,7 +22,7 @@ public class EpisodeService {
 		return (List<Episode>) episodeRepository.findAll();
 	}
 
-	@GetMapping("/api/podcasts/podcastId/episodes")
+	@GetMapping("/api/podcasts/{podcastId}/episodes")
 	public List<Episode> getEpisodesForPodcasts(@PathVariable("podcastId") int podcastId) {
 		return episodeRepository.findEpisodesByPodcastId(podcastId);
 	}
