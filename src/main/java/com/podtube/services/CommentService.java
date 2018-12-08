@@ -1,16 +1,64 @@
 package com.podtube.services;
 
+import com.podtube.models.Comment;
+import com.podtube.models.Podcast;
+import com.podtube.models.User;
 import com.podtube.repositories.CommentRepository;
+import com.podtube.repositories.PodcastRepository;
+import com.podtube.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.activation.CommandMap;
+import javax.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins="*", allowedHeaders = "*", allowCredentials = "true")
 public class CommentService {
 	@Autowired
 	CommentRepository commentRepository;
+	@Autowired
+	PodcastRepository podcastRepository;
+	@Autowired
+	UserRepository userRepository;
 
+	@GetMapping("/api/podcast/{podcastId}/comment")
+	ResponseEntity<List<Comment>> findCommentsForPodcast(@PathVariable("podcastId") int podcastId) {
+		Optional<Podcast> podcastOpt = podcastRepository.findById(podcastId);
+		if(!podcastOpt.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		Podcast podcast = podcastOpt.get();
+		return new ResponseEntity<>(commentRepository.findCommentsByPodcast(podcast), HttpStatus.OK);
+	}
+
+	@GetMapping("/api/user/{userId}/comment")
+	ResponseEntity<List<Comment>> findCommentsForUser(@PathVariable("userId") int userId) {
+		Optional<User> userOpt = userRepository.findById(userId);
+		if(!userOpt.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		User user = userOpt.get();
+		return new ResponseEntity<>(commentRepository.findCommentsByUser(user), HttpStatus.OK);
+	}
+
+	@PostMapping("/api/podcast/{podcastId}/comment")
+	ResponseEntity<Comment> createComment(HttpSession httpSession,
+										  @PathVariable("podcastId") int podcastId,
+										  @RequestBody Comment comment) {
+		if (!ServiceUtils.isValidSession(httpSession))
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		int id = (int) httpSession.getAttribute("id");
+		Optional<User> userOpt = userRepository.findById(id);
+		if (!userOpt.isPresent()) new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		User user = userOpt.get();
+		Optional<Podcast> podcastOpt = podcastRepository.findById(podcastId);
+		if (!podcastOpt.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		Podcast podcast = podcastOpt.get();
+		comment.setPodcast(podcast);
+		comment.setUser(user);
+		return new ResponseEntity<>(commentRepository.save(comment), HttpStatus.OK);
+	}
 }
 
 /*public class CourseService {

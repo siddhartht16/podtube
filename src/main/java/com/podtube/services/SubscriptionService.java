@@ -48,14 +48,10 @@ public class SubscriptionService {
 			Subscription subscription = new Subscription();
 			subscription.setPodcast(podcast);
 			subscription.setUser(user);
-			try {
-				Subscription addedSubscription = subscriptionRepository.save(subscription);
-				addedSubscription.getPodcast().setSubscribed(true);
-				return new ResponseEntity<>(addedSubscription.getPodcast(), HttpStatus.OK);
-			} catch (RuntimeException ex) {
-				return new ResponseEntity<Podcast>(HttpStatus.BAD_REQUEST);
-			}
-		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+            Subscription addedSubscription = subscriptionRepository.save(subscription);
+            addedSubscription.getPodcast().setSubscribed(true);
+            return new ResponseEntity<>(addedSubscription.getPodcast(), HttpStatus.OK);
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
 	}
 
 	@DeleteMapping("/api/subscription/podcast/{podcastId}")
@@ -76,6 +72,6 @@ public class SubscriptionService {
 			subscriptionRepository.delete(subscriptionToDelete);
 			podcast.setSubscribed(false);
 			return new ResponseEntity<>(podcast, HttpStatus.OK);
-		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.UNAUTHORIZED));
 	}
 }

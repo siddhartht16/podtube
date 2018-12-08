@@ -42,4 +42,12 @@ public class Comment {
 	private Date modifiedOn;
 
 	public Comment() {}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public void setPodcast(Podcast podcast) {
+		this.podcast = podcast;
+	}
 }
