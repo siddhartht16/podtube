@@ -36,4 +36,16 @@ public class Bookmark {
 	private Date modifiedOn;
 
 	public Bookmark() {}
+
+	public User getUser() {
+		return user;
+	}
+
+	public Episode getEpisode() {
+		return episode;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
 }
