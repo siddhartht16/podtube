@@ -32,7 +32,7 @@ public class PodcastService {
 	}
 
 	@GetMapping("/api/categories/{categoryId}/podcasts")
-	public ResponseEntity<List<Podcast>>  getPodcastsForCategory(HttpSession httpSession,
+	public ResponseEntity<List<Podcast>> getPodcastsForCategory(HttpSession httpSession,
 																 @PathVariable("categoryId") int categoryId) {
 		int id = 0;
 		if (httpSession.getAttribute("id") != null)

@@ -42,4 +42,20 @@ public class Rating {
 	private Date modifiedOn;
 
 	public Rating() {}
+
+	public void setPodcast(Podcast podcast) {
+		this.podcast = podcast;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public Podcast getPodcast() {
+		return podcast;
+	}
 }
