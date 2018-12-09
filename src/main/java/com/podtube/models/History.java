@@ -40,4 +40,16 @@ public class History {
 	private Date playedOn;
 
 	public History() {}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public void setEpisode(Episode episode) {
+		this.episode = episode;
+	}
 }
