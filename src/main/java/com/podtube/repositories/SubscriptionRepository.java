@@ -15,4 +15,6 @@ public interface SubscriptionRepository
 	List<Subscription> findAllByUser_IdOrderByCreatedOnDesc(int userId);
 
 	Subscription findByUserAndPodcastOrderByCreatedOnDesc(User user, Podcast podcast);
+
+	Subscription findSubscriptionByPodcastIdAndUserId(int podcastId, int userId);
 }

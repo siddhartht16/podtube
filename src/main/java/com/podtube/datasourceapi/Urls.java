@@ -9,6 +9,8 @@ public final class Urls {
     private static final String GPODDER_RESPONSE_FORMAT_JSON = ".json";
     private static final String GPODDER_TAGS = "/tags/";
     private static final String GPODDER_TAG = "/tag/";
+    private static final String GPODDER_SEARCH = "search";
+    private static final String GPODDER_SEARCH_QUERY_PARAM = "?q=";
 
     //RSS2JSON Urls
     private static final String RSSTOJSON_BASE_URL = "https://api.rss2json.com/v1/api.json?";
@@ -40,6 +42,18 @@ public final class Urls {
                 p_tag + "/" +
                 p_number_of_podcasts +
                 GPODDER_RESPONSE_FORMAT_JSON;
+
+        return result;
+    }//get_gpodder_tags_url..
+
+    public static String get_gpodder_search_url(String p_search_term) {
+
+        //    https://gpodder.net/api/2/tag/tech-news/500.json
+        String result = GPODDER_BASE_URL +
+                GPODDER_SEARCH +
+                GPODDER_RESPONSE_FORMAT_JSON +
+                GPODDER_SEARCH_QUERY_PARAM +
+                p_search_term;
 
         return result;
     }//get_gpodder_tags_url..

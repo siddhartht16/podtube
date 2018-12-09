@@ -129,8 +129,6 @@ public class APIUtils {
         return gPodderTagPodcasts;
     }//getPodcastsForTag..
 
-
-
     public List<RSSFeedItem> getEpisodesForPodcast(String feedUrl) {
 
         String rsstojsonUrl = Urls.get_rsstojson_url(feedUrl, NUMBER_OF_RESPONSES);
@@ -206,4 +204,48 @@ public class APIUtils {
         System.out.println(rssFeedItemsList.size());
         return rssFeedItemsList;
     }//getEpisodesForPodcast..
+
+    public List<GPodderPodcast> searchGPodder(String searchTerm) {
+
+        String searchUrl = Urls.get_gpodder_search_url(searchTerm);
+        List<GPodderPodcast> gPodderPodcasts = new ArrayList<>();
+
+        JSONArray searchResponse = makeRequest(searchUrl);
+
+        //In case some exception
+        //TODO: Log exception and handle properly
+        if (searchResponse == null) {
+            return gPodderPodcasts;
+        }//if..
+
+        for (Object jsonNode : searchResponse) {
+
+            String url = getKeyValue(jsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_URL);
+            String title = getKeyValue(jsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_TITLE);
+            String description = getKeyValue(jsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_DESCRIPTION);
+            String subscribers = getKeyValue(jsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_SUBSCRIBERS);
+            String subscribers_last_week = getKeyValue(jsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_SUBSCRIBERS_LAST_WEEK);
+            String logo_url = getKeyValue(jsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_LOGO_URL);
+            String scaled_logo_url = getKeyValue(jsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_SCALED_LOGO_URL);
+            String website = getKeyValue(jsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_WEBSITE);
+            String mygpo_link = getKeyValue(jsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_MYGPO_LINK);
+
+            GPodderPodcast gPodderPodcast = new GPodderPodcastImpl(
+                    url,
+                    title,
+                    description,
+                    Integer.valueOf(subscribers),
+                    Integer.valueOf(subscribers_last_week),
+                    logo_url,
+                    scaled_logo_url,
+                    website,
+                    mygpo_link);
+
+            gPodderPodcasts.add(gPodderPodcast);
+        }//for..
+
+        System.out.println("Done");
+        return gPodderPodcasts;
+    }//searchGPodder..
+
 }//APIUtils..
