@@ -54,4 +54,8 @@ public class Playlist {
 	public void removeEpisode(Episode episode){
 		this.episodes.remove(episode);
 	}
+
+	public int getId() {
+		return id;
+	}
 }
