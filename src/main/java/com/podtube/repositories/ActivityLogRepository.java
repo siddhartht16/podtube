@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 
-public interface ActivityRepository
+public interface ActivityLogRepository
 	extends CrudRepository<ActivityLog, Integer> {
 
 	List<ActivityLog> findActivityLogsByUser_Id(int userId);
