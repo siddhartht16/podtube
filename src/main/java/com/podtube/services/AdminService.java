@@ -2,6 +2,8 @@ package com.podtube.services;
 
 import com.podtube.common.UserRole;
 import com.podtube.customentities.AppStatistics;
+import com.podtube.models.Category;
+import com.podtube.models.Episode;
 import com.podtube.models.Podcast;
 import com.podtube.models.User;
 import com.podtube.repositories.CategoryRepository;
@@ -143,18 +145,18 @@ public class AdminService {
         }
 
         //Get number of users
-        int normalUserCount = userRepository.findAllByUserRoleEquals(UserRole.ADMIN).size();
-        int adminUserCount = userRepository.findAllByUserRoleEquals(UserRole.USER).size();
+        int normalUserCount = userRepository.findAllByUserRoleEquals(UserRole.USER).size();
+        int adminUserCount = userRepository.findAllByUserRoleEquals(UserRole.ADMIN).size();
         int allUsersCount = normalUserCount + adminUserCount;
 
         //Get number of podcasts
         int numberOfPodcasts = ((List<Podcast>) podcastRepository.findAll()).size();
 
         //Get number of categories
-        int numberOfCategories = ((List<Podcast>) podcastRepository.findAll()).size();
+        int numberOfCategories = ((List<Category>) categoryRepository.findAll()).size();
 
         //Get number of episodes
-        int numberOfEpisodes = ((List<Podcast>) podcastRepository.findAll()).size();
+        int numberOfEpisodes = ((List<Episode>) episodeRepository.findAll()).size();
 
         AppStatistics appStatistics = new AppStatistics();
 
