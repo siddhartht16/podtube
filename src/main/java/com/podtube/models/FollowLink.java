@@ -32,4 +32,12 @@ public class FollowLink {
     @Column(name = "modified_on", nullable = false)
     @LastModifiedDate
     private Date modifiedOn;
+
+    public User getFollower() {
+        return follower;
+    }
+
+    public User getFollowee() {
+        return followee;
+    }
 }
