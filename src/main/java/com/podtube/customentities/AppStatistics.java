@@ -6,6 +6,8 @@ import lombok.Data;
 public class AppStatistics {
 
     private long noOfUsers;
+    private long noOfAdminUsers;
+    private long noOfTotalUsers;
     private long noOfCategories;
     private long noOfPodcasts;
     private long noOfEpisodes;
@@ -43,5 +45,21 @@ public class AppStatistics {
 
     public void setNoOfEpisodes(long noOfEpisodes) {
         this.noOfEpisodes = noOfEpisodes;
+    }
+
+    public long getNoOfAdminUsers() {
+        return noOfAdminUsers;
+    }
+
+    public void setNoOfAdminUsers(long noOfAdminUsers) {
+        this.noOfAdminUsers = noOfAdminUsers;
+    }
+
+    public long getNoOfTotalUsers() {
+        return noOfTotalUsers;
+    }
+
+    public void setNoOfTotalUsers(long noOfTotalUsers) {
+        this.noOfTotalUsers = noOfTotalUsers;
     }
 }

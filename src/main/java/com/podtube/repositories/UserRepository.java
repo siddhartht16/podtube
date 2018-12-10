@@ -24,4 +24,9 @@ public interface UserRepository
 
 	//Register User
 	User findUserByUsernameEquals(String username);
+
+	//Get by id
+	User findByIdEquals(int id);
+
+	Long countAllByUserRoleEquals(UserRole userRole);
 }
