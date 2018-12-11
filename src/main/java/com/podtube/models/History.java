@@ -52,4 +52,8 @@ public class History {
 	public void setEpisode(Episode episode) {
 		this.episode = episode;
 	}
+
+	public Episode getEpisode() {
+		return episode;
+	}
 }

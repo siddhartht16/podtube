@@ -1,5 +1,9 @@
 package com.podtube.customentities;
 
+import com.podtube.models.Subscription;
+
+import java.util.List;
+
 public class UserPublicProfile {
 
     private int id;
@@ -7,6 +11,7 @@ public class UserPublicProfile {
     private String lastname;
     private String username;
     private boolean isFollowed;
+    private List<Subscription> subscriptions;
 
     public int getId() {
         return id;

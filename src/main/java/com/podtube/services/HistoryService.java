@@ -1,6 +1,7 @@
 package com.podtube.services;
 
 import com.podtube.models.*;
+import com.podtube.repositories.BookmarkRepository;
 import com.podtube.repositories.EpisodeRepository;
 import com.podtube.repositories.HistoryRepository;
 import com.podtube.repositories.UserRepository;
@@ -10,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @CrossOrigin(origins="*", allowedHeaders = "*", allowCredentials = "true")
@@ -25,6 +28,9 @@ public class HistoryService {
 
 	@Autowired
 	EpisodeRepository episodeRepository;
+
+	@Autowired
+	BookmarkRepository bookmarkRepository;
 
 	@GetMapping("/api/history")
 	ResponseEntity<List<History>> findHistoryForUser(HttpSession httpSession) {
@@ -42,7 +48,19 @@ public class HistoryService {
 
 		User user = userOpt.get();
 
-		return new ResponseEntity<>(historyRepository.findAllByUser_IdOrderByCreatedOnDesc(user.getId()), HttpStatus.OK);
+		List<History> historyList = historyRepository.findAllByUser_IdOrderByCreatedOnDesc(user.getId());
+		List<Bookmark> bookmarks = bookmarkRepository.findAllByUser_IdOrderByCreatedOnDesc(user.getId());
+		Set<Episode> bookmarkedEpisodes = new HashSet<>();
+		for (Bookmark bookmark : bookmarks) {
+			bookmarkedEpisodes.add(bookmark.getEpisode());
+		}
+		for (History history : historyList) {
+			if (bookmarkedEpisodes.contains(history.getEpisode()))
+				history.getEpisode().setBookmarked(true);
+		}
+
+
+		return new ResponseEntity<>(historyList, HttpStatus.OK);
 	}//findHistorysForUser..
 
 
@@ -106,8 +124,17 @@ public class HistoryService {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
 		// delete comment
-		historyRepository.delete(history);
 		List<History> historyList = historyRepository.findAllByUser_IdOrderByCreatedOnDesc(user.getId());
+		List<Bookmark> bookmarks = bookmarkRepository.findAllByUser_IdOrderByCreatedOnDesc(user.getId());
+		Set<Episode> bookmarkedEpisodes = new HashSet<>();
+		for (Bookmark bookmark : bookmarks) {
+			bookmarkedEpisodes.add(bookmark.getEpisode());
+		}
+		for (History h : historyList) {
+			if (bookmarkedEpisodes.contains(history.getEpisode()))
+				h.getEpisode().setBookmarked(true);
+		}
+
 		return new ResponseEntity<>(historyList, HttpStatus.OK);
 	}//deleteHistory..
 }//HistoryService..

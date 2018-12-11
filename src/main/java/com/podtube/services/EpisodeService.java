@@ -27,6 +27,8 @@ public class EpisodeService {
 	BookmarkRepository bookmarkRepository;
 	@Autowired
 	UserRepository userRepository;
+	@Autowired
+	SyncService syncService;
 
 //	@GetMapping("/api/episodes")
 //	public ResponseEntity<List<Episode>> findAllEpisodes() {
@@ -41,6 +43,10 @@ public class EpisodeService {
 		if (httpSession.getAttribute("id") != null)
 			userId = (int) httpSession.getAttribute("id");
 		List<Episode> episodes = episodeRepository.findEpisodesByPodcastId(podcastId);
+		if (episodes.size() == 0) {
+			syncService.syncEpisodesForPodcastFromRSSFeed(podcastId);
+			episodes = episodeRepository.findEpisodesByPodcastId(podcastId);
+		}
 		if (userId != 0){
 			// verify if user exists
 			Optional<User> userOpt = userRepository.findById(userId);
