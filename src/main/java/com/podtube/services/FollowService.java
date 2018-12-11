@@ -126,7 +126,7 @@ public class FollowService {
         followeeProfile.setFirstname(followee.getFirstname());
         followeeProfile.setLastname(followee.getLastname());
         followeeProfile.setUsername(followee.getUsername());
-        followeeProfile.setFollwed(true);
+        followeeProfile.setFollowed(true);
 
         return new ResponseEntity<>(followeeProfile, HttpStatus.OK);
     }//followUser..
@@ -167,7 +167,7 @@ public class FollowService {
         followeeProfile.setFirstname(followee.getFirstname());
         followeeProfile.setLastname(followee.getLastname());
         followeeProfile.setUsername(followee.getUsername());
-        followeeProfile.setFollwed(true);
+        followeeProfile.setFollowed(true);
 
         return new ResponseEntity<>(followeeProfile, HttpStatus.OK);
     }//unfollowUser..

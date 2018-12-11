@@ -223,7 +223,7 @@ public class UserService {
 
 		FollowLink followLink = followLinkRepository.findByFolloweeIdAndFollowerId(queriedUser.getId(), user.getId());
 		if (followLink != null)
-			userPublicProfile.setFollwed(true);
+			userPublicProfile.setFollowed(true);
 
 		return new ResponseEntity<>(userPublicProfile, HttpStatus.OK);
 	}//getUserProfile..
