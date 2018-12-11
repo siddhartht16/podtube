@@ -6,7 +6,7 @@ public class UserPublicProfile {
     private String firstname;
     private String lastname;
     private String username;
-    private boolean isFollwed;
+    private boolean isFollowed;
 
     public int getId() {
         return id;
@@ -40,11 +40,11 @@ public class UserPublicProfile {
         this.username = username;
     }
 
-    public boolean isFollwed() {
-        return isFollwed;
+    public boolean isFollowed() {
+        return isFollowed;
     }
 
-    public void setFollwed(boolean follwed) {
-        isFollwed = follwed;
+    public void setFollowed(boolean followed) {
+        isFollowed = followed;
     }
 }
