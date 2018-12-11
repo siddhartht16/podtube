@@ -43,7 +43,10 @@ public class SearchService {
         for (GPodderPodcast gPodderPodcast : searchedPodcasts) {
 
             //Considering url as unique criteria as of now for podcasts
+            // skip if url is empty
             String url = gPodderPodcast.getUrl();
+            if ("".equals(url))
+                continue;
 
             Podcast podcastForUrl = null;
 

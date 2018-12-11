@@ -32,6 +32,10 @@ public class BookmarkService {
 		if (!ServiceUtils.isValidSession(httpSession))
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		int id = (int) httpSession.getAttribute("id");
+		// Does user exist
+		Optional<User> userOpt = userRepository.findById(id);
+		if (!userOpt.isPresent()) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
 		List<Bookmark> userBookmarks = bookmarkRepository.findAllByUser_IdOrderByCreatedOnDesc(id);
 		for (Bookmark bookmark : userBookmarks) {
 			bookmark.getEpisode().setBookmarked(true);

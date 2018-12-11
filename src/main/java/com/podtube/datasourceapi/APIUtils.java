@@ -35,6 +35,18 @@ public class APIUtils {
         return result;
     }//makeRequest..
 
+    private JSONObject makeRequestForSingleJsonNodeResponse(String url) {
+        JSONObject result = null;
+        try {
+            HttpResponse<JsonNode> jsonResponse = Unirest.get(url).asJson();
+            result = jsonResponse.getBody().getObject();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
     private String getKeyValue(Object jsonNode, String key){
 
         String result = "";
@@ -247,5 +259,33 @@ public class APIUtils {
         System.out.println("Done");
         return gPodderPodcasts;
     }//searchGPodder..
+
+    public GPodderPodcast getPodCastFromGpodder(String podcastUrl) {
+        String podcastRetrievalUrl = Urls.get_gpodder_retrieve_podcast_url(podcastUrl);
+        JSONObject podcastJsonNode = makeRequestForSingleJsonNodeResponse(podcastRetrievalUrl);
+
+        String url = getKeyValue(podcastJsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_URL);
+        String title = getKeyValue(podcastJsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_TITLE);
+        String description = getKeyValue(podcastJsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_DESCRIPTION);
+        String subscribers = getKeyValue(podcastJsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_SUBSCRIBERS);
+        String subscribers_last_week = getKeyValue(podcastJsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_SUBSCRIBERS_LAST_WEEK);
+        String logo_url = getKeyValue(podcastJsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_LOGO_URL);
+        String scaled_logo_url = getKeyValue(podcastJsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_SCALED_LOGO_URL);
+        String website = getKeyValue(podcastJsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_WEBSITE);
+        String mygpo_link = getKeyValue(podcastJsonNode, APIConstants.GPODDER_TAG_PODCAST_RESPONSE_KEY_MYGPO_LINK);
+
+        GPodderPodcast gPodderPodcast = new GPodderPodcastImpl(
+                url,
+                title,
+                description,
+                Integer.valueOf(subscribers),
+                Integer.valueOf(subscribers_last_week),
+                logo_url,
+                scaled_logo_url,
+                website,
+                mygpo_link);
+        System.out.println("Done");
+        return gPodderPodcast;
+    }
 
 }//APIUtils..
