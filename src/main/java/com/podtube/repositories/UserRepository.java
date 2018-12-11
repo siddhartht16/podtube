@@ -28,5 +28,5 @@ public interface UserRepository
 	//Get by id
 	User findByIdEquals(int id);
 
-	Long countAllByUserRoleEquals(UserRole userRole);
+	long countAllByUserRoleEquals(UserRole userRole);
 }
