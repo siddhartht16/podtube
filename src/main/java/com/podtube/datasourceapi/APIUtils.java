@@ -158,9 +158,29 @@ public class APIUtils {
 //        Object response = ((JSONObject)rssFeedItemsResponse.get(0));
 
         //Read Status, Feed, Items
-        Object status = ((JSONObject)rssFeedItemsResponse.get(0)).get(APIConstants.RSSTOJSON_RESPONSE_KEY_STATUS);
-        Object feed = ((JSONObject)rssFeedItemsResponse.get(0)).get(APIConstants.RSSTOJSON_RESPONSE_KEY_FEED);
-        JSONArray items = (JSONArray) ((JSONObject)rssFeedItemsResponse.get(0)).get(APIConstants.RSSTOJSON_RESPONSE_KEY_ITEMS);
+        try {
+            Object status = ((JSONObject)rssFeedItemsResponse.get(0)).get(APIConstants.RSSTOJSON_RESPONSE_KEY_STATUS);
+        }catch (JSONException ignored){
+            //TODO: Log this
+        }
+
+        try {
+            Object feed = ((JSONObject)rssFeedItemsResponse.get(0)).get(APIConstants.RSSTOJSON_RESPONSE_KEY_FEED);
+        }catch (JSONException ignored){
+            //TODO: Log this
+        }
+
+        JSONArray items = null;
+        try {
+            items = (JSONArray) ((JSONObject)rssFeedItemsResponse.get(0)).get(APIConstants.RSSTOJSON_RESPONSE_KEY_ITEMS);
+        }
+        catch (Exception ex){
+            return rssFeedItemsList;
+        }
+
+        if(items==null){
+            return rssFeedItemsList;
+        }
 
         for (Object jsonNode : items) {
 

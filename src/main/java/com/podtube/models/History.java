@@ -37,6 +37,7 @@ public class History {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "played_on", nullable = false)
+	@CreatedDate
 	private Date playedOn;
 
 	public History() {}

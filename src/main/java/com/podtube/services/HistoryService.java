@@ -1,5 +1,6 @@
 package com.podtube.services;
 
+import com.podtube.customentities.ResponseWrapper;
 import com.podtube.models.*;
 import com.podtube.repositories.BookmarkRepository;
 import com.podtube.repositories.EpisodeRepository;
@@ -137,4 +138,30 @@ public class HistoryService {
 
 		return new ResponseEntity<>(historyList, HttpStatus.OK);
 	}//deleteHistory..
+
+	@DeleteMapping("/api/history/clear")
+	ResponseEntity<ResponseWrapper> clearHistory(HttpSession httpSession) {
+
+		// check LoggedIn
+		if (!ServiceUtils.isValidSession(httpSession))
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+		// check if user with id exists
+		int id = (int) httpSession.getAttribute("id");
+		Optional<User> userOpt = userRepository.findById(id);
+		if (!userOpt.isPresent()) new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+		User user = userOpt.get();
+
+		// delete comment
+		List<History> historyList = historyRepository.findAllByUser_IdOrderByCreatedOnDesc(user.getId());
+		historyRepository.deleteAll(historyList);
+
+		ResponseWrapper responseWrapper = new ResponseWrapper();
+		responseWrapper.setSuccess(true);
+
+		return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
+	}//deleteHistory..
+
+
 }//HistoryService..
