@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins="*", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins="https://rocky-basin-94797.herokuapp.com/", allowedHeaders = "*", allowCredentials = "true")
 public class SyncService {
 
 	@Autowired
