@@ -1,8 +1,8 @@
 package com.podtube.services;
 
 import com.podtube.models.*;
+import com.podtube.repositories.EpisodeRepository;
 import com.podtube.repositories.HistoryRepository;
-import com.podtube.repositories.PodcastRepository;
 import com.podtube.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,10 +21,10 @@ public class HistoryService {
 	HistoryRepository historyRepository;
 
 	@Autowired
-	PodcastRepository podcastRepository;
+	UserRepository userRepository;
 
 	@Autowired
-	UserRepository userRepository;
+	EpisodeRepository episodeRepository;
 
 	@GetMapping("/api/history")
 	ResponseEntity<List<History>> findHistoryForUser(HttpSession httpSession) {
@@ -35,11 +35,10 @@ public class HistoryService {
 
 		// check if user with id exists
 		int id = (int) httpSession.getAttribute("id");
-
 		Optional<User> userOpt = userRepository.findById(id);
 
 		if(!userOpt.isPresent())
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
 		User user = userOpt.get();
 
@@ -47,9 +46,9 @@ public class HistoryService {
 	}//findHistorysForUser..
 
 
-	@PostMapping("/api/history")
+	@PostMapping("/api/history/episode/{episodeId}")
 	ResponseEntity<History> createHistoryItem(HttpSession httpSession,
-												@RequestBody History history) {
+											  @PathVariable("episodeId") int episodeId) {
 
 		// check LoggedIn
 		if (!ServiceUtils.isValidSession(httpSession))
@@ -57,20 +56,30 @@ public class HistoryService {
 
 		// check if user with id exists
 		int id = (int) httpSession.getAttribute("id");
-
 		Optional<User> userOpt = userRepository.findById(id);
 		if (!userOpt.isPresent())
 			new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
 		User user = userOpt.get();
 
-		//TODO: Not sure how to check if episode exists which came in json
+		// check if episode exists
+		Optional<Episode> episodeOpt = episodeRepository.findById(episodeId);
+		if (!episodeOpt.isPresent()) new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-		//Create history
+		Episode episode = episodeOpt.get();
+
+		History history = historyRepository.findByUserAndEpisode(user, episode);
+		// delete if already exists
+		if (history != null) historyRepository.delete(history);
+
+		history = new History();
 		history.setUser(user);
+		history.setEpisode(episode);
 		History savedHistory = historyRepository.save(history);
 		return new ResponseEntity<>(savedHistory, HttpStatus.OK);
 	}//createHistory..
+
+
 
 	@DeleteMapping("/api/history/{historyId}")
 	ResponseEntity<List<History>> deleteHistory(HttpSession httpSession,
@@ -91,7 +100,7 @@ public class HistoryService {
 		if (!historyOpt.isPresent())
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-		// check if comment is owned by logged in user
+		// check if history is owned by logged in user
 		History history = historyOpt.get();
 		if (history.getUser().getId() != user.getId())
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
