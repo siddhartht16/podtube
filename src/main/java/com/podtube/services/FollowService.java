@@ -4,6 +4,7 @@ import com.podtube.customentities.ResponseWrapper;
 import com.podtube.customentities.UserPublicProfile;
 import com.podtube.models.*;
 import com.podtube.repositories.FollowLinkRepository;
+import com.podtube.repositories.SubscriptionRepository;
 import com.podtube.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,8 @@ public class FollowService {
     FollowLinkRepository followLinkRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    SubscriptionRepository subscriptionRepository;
 
     @GetMapping("/api/followers")
     public ResponseEntity<List<UserPublicProfile>> getAllFollowers(HttpSession httpSession) {
@@ -127,6 +130,9 @@ public class FollowService {
         followeeProfile.setLastname(followee.getLastname());
         followeeProfile.setUsername(followee.getUsername());
         followeeProfile.setFollowed(true);
+        followeeProfile.populateFollowees(followLinkRepository);
+        followeeProfile.populateFollowers(followLinkRepository);
+        followeeProfile.populateSubscriptions(subscriptionRepository, userRepository, id);
 
         return new ResponseEntity<>(followeeProfile, HttpStatus.OK);
     }//followUser..
@@ -168,6 +174,9 @@ public class FollowService {
         followeeProfile.setLastname(followee.getLastname());
         followeeProfile.setUsername(followee.getUsername());
         followeeProfile.setFollowed(false);
+        followeeProfile.populateFollowees(followLinkRepository);
+        followeeProfile.populateFollowers(followLinkRepository);
+        followeeProfile.populateSubscriptions(subscriptionRepository, userRepository, id);
 
         return new ResponseEntity<>(followeeProfile, HttpStatus.OK);
     }//unfollowUser..
