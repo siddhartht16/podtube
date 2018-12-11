@@ -165,25 +165,31 @@ public class UserService {
 		if (!ServiceUtils.isValidSession(httpSession))
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-		//TODO: Check for if logged in user is normal user
-
-		//TODO: Check if id retrieved is valid id for the incoming user object
 		int id = (int) httpSession.getAttribute("id");
 		Optional<User> userOpt = userRepository.findById(id);
 
-		return new ResponseEntity<>(user, HttpStatus.OK);
+		// check if user with id exists
+		if (!userOpt.isPresent()) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-		//TODO: Check this implementation
-//		return userOpt.map(userToUpdate -> {
-//			if (!"".equals(user.getFirstName())) userToUpdate.setFirstName(user.getFirstName());
-//			if (!"".equals(user.getLastName())) userToUpdate.setLastName(user.getLastName());
-//			if (!"".equals(user.getPhone())) userToUpdate.setPhone(user.getPhone());
-//			if (!"".equals(user.getEmail())) userToUpdate.setEmail(user.getEmail());
-//			user.setRole(profile.getRole());
-//			if (!"".equals(profile.getDateOfBirth())) user.setDateOfBirth(profile.getDateOfBirth());
-//			user = userRepository.save(user);
-//			return new ResponseEntity<>(user, HttpStatus.OK);
-//		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+		User userToUpdate = userOpt.get();
+		if (user.getFirstname() != null
+				&& !("".equals(user.getFirstname())))
+			userToUpdate.setFirstname(user.getFirstname());
+
+		if (user.getLastname() != null
+				&& !("".equals(user.getLastname())))
+			userToUpdate.setLastname(user.getLastname());
+
+		if (user.getEmail() != null
+				&& !("".equals(user.getEmail())))
+			userToUpdate.setEmail(user.getEmail());
+
+		if (user.getPassword() != null
+				&& !("".equals(user.getPassword())))
+			userToUpdate.setPassword(user.getPassword());
+
+		user = userRepository.save(userToUpdate);
+		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 
 	@GetMapping("/api/profile/{userId}")
