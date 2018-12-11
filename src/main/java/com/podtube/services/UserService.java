@@ -7,10 +7,7 @@ import com.podtube.models.Comment;
 import com.podtube.models.FollowLink;
 import com.podtube.models.Rating;
 import com.podtube.models.User;
-import com.podtube.repositories.CommentRepository;
-import com.podtube.repositories.FollowLinkRepository;
-import com.podtube.repositories.RatingRepository;
-import com.podtube.repositories.UserRepository;
+import com.podtube.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +33,9 @@ public class UserService {
 
 	@Autowired
 	FollowLinkRepository followLinkRepository;
+
+	@Autowired
+	SubscriptionRepository subscriptionRepository;
 
 	@PostMapping("/api/register")
 	public ResponseEntity<User> register(@RequestBody User user, HttpSession httpSession) {
@@ -220,6 +220,9 @@ public class UserService {
 		userPublicProfile.setUsername(queriedUser.getUsername());
 		userPublicProfile.setFirstname(queriedUser.getFirstname());
 		userPublicProfile.setLastname(queriedUser.getLastname());
+		userPublicProfile.populateFollowees(followLinkRepository);
+		userPublicProfile.populateFollowers(followLinkRepository);
+		userPublicProfile.populateSubscriptions(subscriptionRepository, userRepository, id);
 
 		FollowLink followLink = followLinkRepository.findByFolloweeIdAndFollowerId(queriedUser.getId(), user.getId());
 		if (followLink != null)
