@@ -51,22 +51,22 @@ public class UserService {
 		return new ResponseEntity<>(newUser, HttpStatus.OK);
 	}
 
+//	@GetMapping("/api/profile")
+//	public ResponseEntity<User> profile(HttpSession httpSession) {
+//
+//		if (!ServiceUtils.isValidSession(httpSession))
+//			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//
+//		//TODO: Check for if logged in user is normal user
+//
+//		int id = (int) httpSession.getAttribute("id");
+//		Optional<User> userOpt = userRepository.findById(id);
+//
+//		return userOpt.map(user -> new ResponseEntity<>(user, HttpStatus.OK))
+//				.orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+//	}
+
 	@GetMapping("/api/profile")
-	public ResponseEntity<User> profile(HttpSession httpSession) {
-
-		if (!ServiceUtils.isValidSession(httpSession))
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-
-		//TODO: Check for if logged in user is normal user
-
-		int id = (int) httpSession.getAttribute("id");
-		Optional<User> userOpt = userRepository.findById(id);
-
-		return userOpt.map(user -> new ResponseEntity<>(user, HttpStatus.OK))
-				.orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
-	}
-
-	@GetMapping("/api/selfprofile")
 	public ResponseEntity<UserProfile> self_profile(HttpSession httpSession) {
 
 		if (!ServiceUtils.isValidSession(httpSession))
@@ -117,6 +117,7 @@ public class UserService {
 		}
 
 		UserProfile userProfile = new UserProfile();
+		userProfile.setUser(user);
 		userProfile.setComments(comments);
 		userProfile.setRatings(ratings);
 		userProfile.setFollowers(followersList);
@@ -185,4 +186,35 @@ public class UserService {
 //		}).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
 	}
 
-}
+	@GetMapping("/api/profile/{userId}")
+	public ResponseEntity<UserPublicProfile> getUserProfile(HttpSession httpSession,
+													  @PathVariable("userId") int userId) {
+
+		if (!ServiceUtils.isValidSession(httpSession))
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+		int id = (int) httpSession.getAttribute("id");
+		Optional<User> userOpt = userRepository.findById(id);
+
+		if(!userOpt.isPresent())
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+		User user = userOpt.get();
+
+		Optional<User> queriedUserOpt = userRepository.findById(userId);
+
+		if(!queriedUserOpt.isPresent())
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+		User queriedUser = queriedUserOpt.get();
+
+		UserPublicProfile userPublicProfile = new UserPublicProfile();
+
+		userPublicProfile.setId(queriedUser.getId());
+		userPublicProfile.setUsername(queriedUser.getUsername());
+		userPublicProfile.setFirstname(queriedUser.getFirstname());
+		userPublicProfile.setLastname(queriedUser.getLastname());
+
+		return new ResponseEntity<>(userPublicProfile, HttpStatus.OK);
+	}//getUserProfile..
+}//UserService..

@@ -12,4 +12,6 @@ public interface FollowLinkRepository
     List<FollowLink> findAllByFolloweeId(int followeeId);
 
     List<FollowLink> findAllByFollowerId(int followerId);
+
+    FollowLink findByFolloweeIdAndFollowerId(int followeeId, int followerId);
 }

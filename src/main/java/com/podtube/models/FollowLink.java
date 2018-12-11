@@ -40,4 +40,12 @@ public class FollowLink {
     public User getFollowee() {
         return followee;
     }
+
+    public void setFollower(User follower) {
+        this.follower = follower;
+    }
+
+    public void setFollowee(User followee) {
+        this.followee = followee;
+    }
 }
