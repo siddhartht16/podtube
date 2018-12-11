@@ -89,6 +89,9 @@ public class Episode {
 	@Transient
 	private boolean isPlayed;
 
+	@Transient
+	boolean isBookmarked;
+
 	public Episode() {
 	}
 
@@ -118,12 +121,12 @@ public class Episode {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Episode e = (Episode) o;
-		return link.equals(e.link);
+		return enclosureLink.equals(e.enclosureLink);
 	}
 
 	@Override
 	public int hashCode() {
-		return link.hashCode();
+		return enclosureLink.hashCode();
 	}
 
 	public void setPodcast(Podcast podcast) {
@@ -176,5 +179,9 @@ public class Episode {
 
 	public void setEnclosureThumbnail(String enclosureThumbnail) {
 		this.enclosureThumbnail = enclosureThumbnail;
+	}
+
+	public void setBookmarked(boolean bookmarked) {
+		isBookmarked = bookmarked;
 	}
 }

@@ -158,4 +158,17 @@ public class Podcast {
 	public int getId() {
 		return id;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Podcast p = (Podcast) o;
+		return url.equals(p.url);
+	}
+
+	@Override
+	public int hashCode() {
+		return url.hashCode();
+	}
 }

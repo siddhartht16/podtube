@@ -48,4 +48,8 @@ public class Bookmark {
 	public void setUser(User user) {
 		this.user = user;
 	}
+
+	public void setEpisode(Episode episode) {
+		this.episode = episode;
+	}
 }

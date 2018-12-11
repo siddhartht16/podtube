@@ -30,7 +30,11 @@ public class SubscriptionService {
 		if (!ServiceUtils.isValidSession(httpSession))
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		int id = (int) httpSession.getAttribute("id");
-		return new ResponseEntity<>(subscriptionRepository.findAllByUser_IdOrderByCreatedOnDesc(id), HttpStatus.OK);
+		List<Subscription> userSubscriptions = subscriptionRepository.findAllByUser_IdOrderByCreatedOnDesc(id);
+		for (Subscription subscription : userSubscriptions) {
+			subscription.getPodcast().setSubscribed(true);
+		}
+		return new ResponseEntity<>(userSubscriptions, HttpStatus.OK);
 	}
 
 	@PostMapping("/api/subscription/podcast/{podcastId}")
@@ -44,7 +48,7 @@ public class SubscriptionService {
 			Optional<Podcast> podcastOpt = podcastRepository.findById(podcastId);
 			if(!podcastOpt.isPresent()) return new ResponseEntity<Podcast>(HttpStatus.BAD_REQUEST);
 			Podcast podcast = podcastOpt.get();
-			Subscription existingSubscription = subscriptionRepository.findByUserAndPodcastOrderByCreatedOnDesc(user, podcast);
+			Subscription existingSubscription = subscriptionRepository.findByUserAndPodcast(user, podcast);
 			if (existingSubscription != null) return new ResponseEntity<Podcast>(HttpStatus.BAD_REQUEST);
 			Subscription subscription = new Subscription();
 			subscription.setPodcast(podcast);
@@ -66,7 +70,7 @@ public class SubscriptionService {
 			Optional<Podcast> podcastOpt = podcastRepository.findById(podcastId);
 			if(!podcastOpt.isPresent()) return new ResponseEntity<Podcast>(HttpStatus.BAD_REQUEST);
 			Podcast podcast = podcastOpt.get();
-			Subscription subscriptionToDelete = subscriptionRepository.findByUserAndPodcastOrderByCreatedOnDesc(user, podcast);
+			Subscription subscriptionToDelete = subscriptionRepository.findByUserAndPodcast(user, podcast);
 			if (subscriptionToDelete == null){
 				return new ResponseEntity<Podcast>(HttpStatus.BAD_REQUEST);
 			}

@@ -81,7 +81,11 @@ public class SyncService {
 
 			//TODO: REVISIT THIS CRITERIA
 			//Considering url as unique criteria as of now for podcasts
+
+			// skip if url is empty
 			String url = gPodderPodcast.getUrl();
+			if ("".equals(url))
+				continue;
 
 			Podcast podcastForUrl = null;
 
@@ -139,6 +143,10 @@ public class SyncService {
 			//TODO: REVISIT THIS CRITERIA
 			//Considering url as unique criteria as of now for podcasts
 			String enclosure_link = rssFeedItem.getEnclosure_link();
+
+			// Skip episode if no playable link
+			if ("".equals(enclosure_link))
+				continue;
 
 			Episode episodeForUrl = null;
 
