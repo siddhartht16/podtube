@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins="https://rocky-basin-94797.herokuapp.com", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins="*", allowedHeaders = "*", allowCredentials = "true")
 public class SyncService {
 
 	@Autowired
@@ -187,7 +187,7 @@ public class SyncService {
 		}//for..
 	}//syncEpisodesForPodcastFromRSSFeed..
 
-	@PostMapping("/api/sync/categories")
+	@PostMapping("/admin/sync/categories")
 	public ResponseEntity<List<Category>> syncCategories(HttpSession httpSession) {
 		if (!ServiceUtils.isValidSession(httpSession))
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -203,7 +203,7 @@ public class SyncService {
 		return new ResponseEntity<>(syncedCategories, HttpStatus.OK);
 	}
 
-	@PostMapping("/api/sync/categories/{categoryId}/podcasts")
+	@PostMapping("/admin/sync/categories/{categoryId}/podcasts")
 	public ResponseEntity<List<Podcast>> syncPodcastsForCategory(HttpSession httpSession,
 												 @PathVariable("categoryId") int categoryId) {
 		if (!ServiceUtils.isValidSession(httpSession))
@@ -220,7 +220,7 @@ public class SyncService {
 		return new ResponseEntity<>(syncedPodcasts, HttpStatus.OK);
 	}
 
-	@PostMapping("/api/sync/podcasts/{podcastId}/episodes")
+	@PostMapping("/admin/sync/podcasts/{podcastId}/episodes")
 	public ResponseEntity<List<Episode>> syncEpisodesForPodcast(HttpSession httpSession,
 												@PathVariable("podcastId") int podcastId) {
 		if (!ServiceUtils.isValidSession(httpSession))
