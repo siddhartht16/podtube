@@ -34,7 +34,7 @@ public class AdminService {
     @Autowired
     CategoryRepository categoryRepository;
 
-    private boolean isAdminUser(int userId){
+    protected boolean isAdminUser(int userId){
 
         boolean result = false;
 
@@ -57,9 +57,8 @@ public class AdminService {
         if (!ServiceUtils.isValidSession(httpSession))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        //TODO: Check for if logged in user is admin
+        // check if logged in user is admin
         int id = (int) httpSession.getAttribute("id");
-
         if(!isAdminUser(id)){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -74,14 +73,13 @@ public class AdminService {
         if (!ServiceUtils.isValidSession(httpSession))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        //TODO: Check for if logged in user is admin
         int id = (int) httpSession.getAttribute("id");
 
         if(!isAdminUser(id)){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        return new ResponseEntity<>(userRepository.findByIdEqualsAndUserRoleEquals(id, UserRole.ADMIN), HttpStatus.OK);
+        return new ResponseEntity<>(userRepository.findByIdEqualsAndUserRoleEquals(userId, UserRole.ADMIN), HttpStatus.OK);
     }//findUserById..
 
     @PostMapping("/admin/users")
@@ -91,7 +89,6 @@ public class AdminService {
         if (!ServiceUtils.isValidSession(httpSession))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        //TODO: Check for if logged in user is admin
         int id = (int) httpSession.getAttribute("id");
 
         if(!isAdminUser(id)){
@@ -137,7 +134,6 @@ public class AdminService {
         if (!ServiceUtils.isValidSession(httpSession))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        //TODO: Check for if logged in user is admin
         int id = (int) httpSession.getAttribute("id");
 
         if(!isAdminUser(id)){
@@ -145,18 +141,18 @@ public class AdminService {
         }
 
         //Get number of users
-        int normalUserCount = userRepository.findAllByUserRoleEquals(UserRole.USER).size();
-        int adminUserCount = userRepository.findAllByUserRoleEquals(UserRole.ADMIN).size();
-        int allUsersCount = normalUserCount + adminUserCount;
+        long normalUserCount = userRepository.countAllByUserRoleEquals(UserRole.USER);
+        long adminUserCount = userRepository.countAllByUserRoleEquals(UserRole.ADMIN);
+        long allUsersCount = normalUserCount + adminUserCount;
 
         //Get number of podcasts
-        int numberOfPodcasts = ((List<Podcast>) podcastRepository.findAll()).size();
+        long numberOfPodcasts = podcastRepository.count();
 
         //Get number of categories
-        int numberOfCategories = ((List<Category>) categoryRepository.findAll()).size();
+        long numberOfCategories = categoryRepository.count();
 
         //Get number of episodes
-        int numberOfEpisodes = ((List<Episode>) episodeRepository.findAll()).size();
+        long numberOfEpisodes = episodeRepository.count();
 
         AppStatistics appStatistics = new AppStatistics();
 

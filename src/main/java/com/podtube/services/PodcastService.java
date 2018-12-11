@@ -1,6 +1,5 @@
 package com.podtube.services;
 
-import com.podtube.models.Category;
 import com.podtube.models.Podcast;
 import com.podtube.models.Subscription;
 import com.podtube.models.User;
@@ -56,7 +55,7 @@ public class PodcastService {
 					podcast.setSubscribed(true);
 			}
 		}
-		return new ResponseEntity<>(podcastRepository.getPodcastsForCategory(categoryId), HttpStatus.OK);
+		return new ResponseEntity<>(podcasts, HttpStatus.OK);
 	}
 
 	@GetMapping("/api/podcasts/{podcastId}")

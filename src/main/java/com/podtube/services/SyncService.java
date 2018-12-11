@@ -11,8 +11,11 @@ import com.podtube.repositories.CategoryRepository;
 import com.podtube.repositories.EpisodeRepository;
 import com.podtube.repositories.PodcastRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +32,9 @@ public class SyncService {
 	@Autowired
 	EpisodeRepository episodeRepository;
 
+	@Autowired
+	AdminService adminService;
+
 	private APIUtils apiUtils = new APIUtils();
 
 	private void syncCategoriesFromGpodder(){
@@ -40,6 +46,10 @@ public class SyncService {
 		for(GPodderCategory gPodderCategory: gPodderCategories){
 
 			String tag = gPodderCategory.getTag();
+
+			// skip if tag is empty
+			if ("".equals(tag))
+				continue;
 
 			Category categoryForTag = null;
 
@@ -139,8 +149,6 @@ public class SyncService {
 
 		//
 		for(RSSFeedItem rssFeedItem: rssFeedItems){
-
-			//TODO: REVISIT THIS CRITERIA
 			//Considering url as unique criteria as of now for podcasts
 			String enclosure_link = rssFeedItem.getEnclosure_link();
 
@@ -180,23 +188,52 @@ public class SyncService {
 	}//syncEpisodesForPodcastFromRSSFeed..
 
 	@PostMapping("/api/sync/categories")
-	public List<Category> syncCategories() {
+	public ResponseEntity<List<Category>> syncCategories(HttpSession httpSession) {
+		if (!ServiceUtils.isValidSession(httpSession))
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+		// check if logged in user is admin
+		int id = (int) httpSession.getAttribute("id");
+		if(!adminService.isAdminUser(id)){
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
 
 		this.syncCategoriesFromGpodder();
-		return (List<Category>) categoryRepository.findAll();
+		List<Category> syncedCategories = (List<Category>) categoryRepository.findAll();
+		return new ResponseEntity<>(syncedCategories, HttpStatus.OK);
 	}
 
 	@PostMapping("/api/sync/categories/{categoryId}/podcasts")
-	public List<Podcast> syncPodcastsForCategory(@PathVariable("categoryId") int categoryId) {
+	public ResponseEntity<List<Podcast>> syncPodcastsForCategory(HttpSession httpSession,
+												 @PathVariable("categoryId") int categoryId) {
+		if (!ServiceUtils.isValidSession(httpSession))
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+		// check if logged in user is admin
+		int id = (int) httpSession.getAttribute("id");
+		if(!adminService.isAdminUser(id)){
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
 
 		this.syncPodcastsForCategoryFromGpodder(categoryId);
-		return podcastRepository.getPodcastsForCategory(categoryId);
+		List<Podcast> syncedPodcasts = podcastRepository.getPodcastsForCategory(categoryId);
+		return new ResponseEntity<>(syncedPodcasts, HttpStatus.OK);
 	}
 
 	@PostMapping("/api/sync/podcasts/{podcastId}/episodes")
-	public List<Episode> syncEpisodesForPodcast(@PathVariable("podcastId") int podcastId) {
+	public ResponseEntity<List<Episode>> syncEpisodesForPodcast(HttpSession httpSession,
+												@PathVariable("podcastId") int podcastId) {
+		if (!ServiceUtils.isValidSession(httpSession))
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+		// check if logged in user is admin
+		int id = (int) httpSession.getAttribute("id");
+		if(!adminService.isAdminUser(id)){
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
 
 		this.syncEpisodesForPodcastFromRSSFeed(podcastId);
-		return episodeRepository.findEpisodesByPodcastId(podcastId);
+		List<Episode> syncedEpisodes = episodeRepository.findEpisodesByPodcastId(podcastId);
+		return new ResponseEntity<>(syncedEpisodes, HttpStatus.OK);
 	}
 }
