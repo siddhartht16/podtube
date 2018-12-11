@@ -77,7 +77,7 @@ public class FollowService {
 
         //Populate followees list
         for(FollowLink followLink: userFolloweesLinkList){
-            User userfollowee = followLink.getFollower();
+            User userfollowee = followLink.getFollowee();
             UserPublicProfile userPublicProfile = new UserPublicProfile();
             userPublicProfile.setId(userfollowee.getId());
             userPublicProfile.setFirstname(userfollowee.getFirstname());
@@ -90,8 +90,8 @@ public class FollowService {
     }//getAllFollowees..
 
     @PostMapping("/api/follow/{userId}")
-    public ResponseEntity<ResponseWrapper> followUser(HttpSession httpSession,
-                                                              @PathVariable("userId") int userId) {
+    public ResponseEntity<UserPublicProfile> followUser(HttpSession httpSession,
+                                                              @PathVariable("userId") int followeeId) {
         if (!ServiceUtils.isValidSession(httpSession))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -103,32 +103,36 @@ public class FollowService {
 
         User user = userOpt.get();
 
-        Optional<User> followedUserOpt = userRepository.findById(userId);
+        Optional<User> followedUserOpt = userRepository.findById(followeeId);
 
         if(!followedUserOpt.isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        User followedUser = followedUserOpt.get();
+        User followee = followedUserOpt.get();
+
+        FollowLink existingFollowLink = followLinkRepository.findByFolloweeIdAndFollowerId(followeeId, id);
+        if (existingFollowLink != null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
         FollowLink followLink = new FollowLink();
-        followLink.setFollowee(followedUser);
+        followLink.setFollowee(followee);
         followLink.setFollower(user);
+        FollowLink savedFollowLink = followLinkRepository.save(followLink);
+        followee = savedFollowLink.getFollowee();
 
-        ResponseWrapper responseWrapper = new ResponseWrapper();
+        UserPublicProfile followeeProfile = new UserPublicProfile();
+        followeeProfile.setId(followee.getId());
+        followeeProfile.setFirstname(followee.getFirstname());
+        followeeProfile.setLastname(followee.getLastname());
+        followeeProfile.setUsername(followee.getUsername());
+        followeeProfile.setFollwed(true);
 
-        try {
-            FollowLink savedFollowLink = followLinkRepository.save(followLink);
-            responseWrapper.setSuccess(true);
-        }
-        catch (Exception e){
-            responseWrapper.setSuccess(false);
-        }
-
-        return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
+        return new ResponseEntity<>(followeeProfile, HttpStatus.OK);
     }//followUser..
 
     @PostMapping("/api/unfollow/{userId}")
-    public ResponseEntity<ResponseWrapper> unfollowUser(HttpSession httpSession,
+    public ResponseEntity<UserPublicProfile> unfollowUser(HttpSession httpSession,
                                                         @PathVariable("userId") int userId) {
 
         if (!ServiceUtils.isValidSession(httpSession))
@@ -149,18 +153,22 @@ public class FollowService {
 
         User followedUser = unfollowedUserOpt.get();
 
+        // check if follow link actually exists
         FollowLink followLink = followLinkRepository.findByFolloweeIdAndFollowerId(followedUser.getId(), user.getId());
-
-        ResponseWrapper responseWrapper = new ResponseWrapper();
-
-        try {
-            followLinkRepository.delete(followLink);
-            responseWrapper.setSuccess(true);
-        }
-        catch (Exception e){
-            responseWrapper.setSuccess(false);
+        if (followLink == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
+        User followee = followLink.getFollowee();
+        followLinkRepository.delete(followLink);
+
+        UserPublicProfile followeeProfile = new UserPublicProfile();
+        followeeProfile.setId(followee.getId());
+        followeeProfile.setFirstname(followee.getFirstname());
+        followeeProfile.setLastname(followee.getLastname());
+        followeeProfile.setUsername(followee.getUsername());
+        followeeProfile.setFollwed(true);
+
+        return new ResponseEntity<>(followeeProfile, HttpStatus.OK);
     }//unfollowUser..
 }

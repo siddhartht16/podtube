@@ -107,7 +107,7 @@ public class UserService {
 
 		//Populate followees list
 		for(FollowLink followLink: userFolloweesLinkList){
-			User userfollowee = followLink.getFollower();
+			User userfollowee = followLink.getFollowee();
 			UserPublicProfile userPublicProfile = new UserPublicProfile();
 			userPublicProfile.setId(userfollowee.getId());
 			userPublicProfile.setFirstname(userfollowee.getFirstname());
@@ -127,16 +127,16 @@ public class UserService {
 	}
 
 
-	@GetMapping("/api/users")
-	public ResponseEntity<List<User>> findAllUsers(HttpSession httpSession) {
-
-		if (!ServiceUtils.isValidSession(httpSession))
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-
-		//TODO: Check for if logged in user is normal user
-
-		return new ResponseEntity<>((List<User>) userRepository.findAll(), HttpStatus.OK);
-	}
+//	@GetMapping("/api/users")
+//	public ResponseEntity<List<User>> findAllUsers(HttpSession httpSession) {
+//
+//		if (!ServiceUtils.isValidSession(httpSession))
+//			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//
+//		//TODO: Check for if logged in user is normal user
+//
+//		return new ResponseEntity<>((List<User>) userRepository.findAll(), HttpStatus.OK);
+//	}
 
 	@PostMapping("/api/login")
 	public ResponseEntity<User> login(@RequestBody User user, HttpSession httpSession) {
@@ -220,6 +220,10 @@ public class UserService {
 		userPublicProfile.setUsername(queriedUser.getUsername());
 		userPublicProfile.setFirstname(queriedUser.getFirstname());
 		userPublicProfile.setLastname(queriedUser.getLastname());
+
+		FollowLink followLink = followLinkRepository.findByFolloweeIdAndFollowerId(queriedUser.getId(), user.getId());
+		if (followLink != null)
+			userPublicProfile.setFollwed(true);
 
 		return new ResponseEntity<>(userPublicProfile, HttpStatus.OK);
 	}//getUserProfile..
