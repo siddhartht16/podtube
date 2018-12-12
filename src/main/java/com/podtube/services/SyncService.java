@@ -219,7 +219,7 @@ public class SyncService {
 		return new ResponseEntity<>(syncedCategories, HttpStatus.OK);
 	}
 
-	@PostMapping("/admin/sync/categories/all/podcasts")
+	@PostMapping("/admin/sync/allcategories/podcasts")
 	public ResponseEntity<ResponseWrapper> syncAllCategoriesPodcasts(HttpSession httpSession) {
 		if (!ServiceUtils.isValidSession(httpSession))
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
