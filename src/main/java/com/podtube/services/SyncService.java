@@ -1,5 +1,7 @@
 package com.podtube.services;
 
+import com.mysql.jdbc.MysqlDataTruncation;
+import com.podtube.common.UserRole;
 import com.podtube.customentities.ResponseWrapper;
 import com.podtube.datasourceapi.APIUtils;
 import com.podtube.feedentities.RSSFeedItem;
@@ -8,15 +10,19 @@ import com.podtube.gpodderentities.GPodderPodcast;
 import com.podtube.models.Category;
 import com.podtube.models.Episode;
 import com.podtube.models.Podcast;
+import com.podtube.models.User;
 import com.podtube.repositories.CategoryRepository;
 import com.podtube.repositories.EpisodeRepository;
 import com.podtube.repositories.PodcastRepository;
+import com.podtube.repositories.UserRepository;
+import org.hibernate.exception.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,11 +40,24 @@ public class SyncService {
 	EpisodeRepository episodeRepository;
 
 	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
 	AdminService adminService;
 
 	private APIUtils apiUtils = new APIUtils();
 
-	private void syncCategoriesFromGpodder(){
+	private void syncCategoriesFromGpodder(int userId){
+
+		if(userId<1){
+			return;
+		}
+
+		User user = userRepository.findByIdEqualsAndUserRoleEquals(userId, UserRole.ADMIN);
+
+		if(user==null){
+			return;
+		}
 
 		//Get categories from GPodder
 		List<GPodderCategory> gPodderCategories = apiUtils.getCategories();
@@ -61,6 +80,8 @@ public class SyncService {
 				//TODO: Log this
 			}
 
+			Category categoryObj;
+
 			if(categoryForTag==null){
 				//Add to database
 				Category category = new Category();
@@ -69,15 +90,56 @@ public class SyncService {
 				category.setTagUsage(gPodderCategory.getTagUsage());
 
 				//Add created by and modified by from session
+				category.setCreatedBy(user.getUsername());
+				category.setModifiedBy(user.getUsername());
 
-				categoryRepository.save(category);
+				//Add last synced on
+				category.setLastSyncedOn(new Date());
+
+				categoryObj = category;
+
+//				try {
+//					categoryRepository.save(category);
+//				}
+//				catch (DataException dataException){
+//					dataException.printStackTrace();
+//				}
 			}//if..
+			else{
+				//Add created by and modified by
+				if (categoryForTag.getCreatedBy() == null || "".equals(categoryForTag.getCreatedBy()))
+					categoryForTag.setCreatedBy(user.getUsername());
+				if (categoryForTag.getModifiedBy() == null || "".equals(categoryForTag.getModifiedBy()))
+					categoryForTag.setModifiedBy(user.getUsername());
+
+				//Add last synced on
+				categoryForTag.setLastSyncedOn(new Date());
+
+				categoryObj = categoryForTag;
+			}//else..
+
+			try {
+				categoryRepository.save(categoryObj);
+			}
+			catch (DataException dataException){
+				dataException.printStackTrace();
+			}
 		}//for..
 	}//syncCategoriesFromGpodder..
 
-	private void syncPodcastsForAllCategoriesFromGpodder() throws InterruptedException {
+	private void syncPodcastsForAllCategoriesFromGpodder(int userId) throws InterruptedException {
 
-		this.syncCategoriesFromGpodder();
+		if(userId<1){
+			return;
+		}
+
+		User user = userRepository.findByIdEqualsAndUserRoleEquals(userId, UserRole.ADMIN);
+
+		if(user==null){
+			return;
+		}
+
+		this.syncCategoriesFromGpodder(userId);
 		Thread.sleep(1000);
 
 		List<Category> categoriesList = (List<Category>) categoryRepository.findAll();
@@ -85,12 +147,22 @@ public class SyncService {
 		for (Category category : categoriesList) {
 
 			int categoryId = category.getId();
-			this.syncPodcastsForCategoryFromGpodder(categoryId);
+			this.syncPodcastsForCategoryFromGpodder(userId, categoryId);
 			Thread.sleep(1000);
 		}//for..
 	}//syncCategoriesFromGpodder..
 
-	public void syncPodcastsForCategoryFromGpodder(int categoryId){
+	public void syncPodcastsForCategoryFromGpodder(int userId, int categoryId){
+
+		if(userId<1){
+			return;
+		}
+
+		User user = userRepository.findByIdEqualsAndUserRoleEquals(userId, UserRole.ADMIN);
+
+		if(user==null){
+			return;
+		}
 
 		Optional<Category> data = categoryRepository.findById(categoryId);
 		if(!data.isPresent()){
@@ -122,6 +194,8 @@ public class SyncService {
 				//TODO: Log this
 			}
 
+			Podcast podcastObj;
+
 			if(podcastForUrl==null){
 				//Add to database
 				Podcast podcast = new Podcast();
@@ -141,17 +215,54 @@ public class SyncService {
 				podcast.addCategory(category);
 
 				//Add created by and modified by from session
+				podcast.setCreatedBy(user.getUsername());
+				podcast.setModifiedBy(user.getUsername());
 
-				podcastRepository.save(podcast);
+				//Set last synced on
+				podcast.setLastSyncedOn(new Date());
+
+//				try {
+//					podcastRepository.save(podcast);
+//				}
+//				catch (DataException dataException){
+//					dataException.printStackTrace();
+//				}
+
+				podcastObj = podcast;
 			}//if..
 			else{
 				//Add this category to existing podcast
 				podcastForUrl.addCategory(category);
+
+				//Add created by and modified by
+				if (podcastForUrl.getCreatedBy() == null || "".equals(podcastForUrl.getCreatedBy()))
+					podcastForUrl.setCreatedBy(user.getUsername());
+				if (podcastForUrl.getCreatedBy() == null || "".equals(podcastForUrl.getModifiedBy()))
+					podcastForUrl.setModifiedBy(user.getUsername());
+
+				podcastObj = podcastForUrl;
+			}//else..
+
+			try {
+				podcastRepository.save(podcastObj);
+			}
+			catch (DataException dataException){
+				dataException.printStackTrace();
 			}
 		}//for..
 	}//syncPodcastsForCategoryFromGpodder..
 
-	public void syncEpisodesForPodcastFromRSSFeed(int podcastId){
+	public void syncEpisodesForPodcastFromRSSFeed(int userId, int podcastId){
+
+		if(userId<1){
+			return;
+		}
+
+		User user = userRepository.findByIdEquals(userId);
+
+		if(user==null){
+			return;
+		}
 
 		Optional<Podcast> data = podcastRepository.findById(podcastId);
 		if(!data.isPresent()){
@@ -181,6 +292,8 @@ public class SyncService {
 				//TODO: Log this
 			}
 
+			Episode episodeObj;
+
 			if(episodeForUrl==null){
 				//Add to database
 				Episode episode = new Episode();
@@ -198,8 +311,39 @@ public class SyncService {
 				episode.setEnclosureDuration(rssFeedItem.getEnclosure_duration());
 				episode.setEnclosureLength(rssFeedItem.getEnclosure_length());
 				episode.setEnclosureThumbnail(rssFeedItem.getEnclosure_thumbnail());
-				episodeRepository.save(episode);
+
+				//Add createdby and modified by
+				episode.setCreatedBy(user.getUsername());
+				episode.setModifiedBy(user.getUsername());
+
+				//Set last synced on
+				episode.setLastSyncedOn(new Date());
+
+//				try {
+//					episodeRepository.save(episode);
+//				}
+//				catch (DataException dataException){
+//					dataException.printStackTrace();
+//				}
+
+				episodeObj = episode;
 			}//if..
+			else{
+				//Add created by and modified by
+				if (episodeForUrl.getCreatedBy() == null || "".equals(episodeForUrl.getCreatedBy()))
+					episodeForUrl.setCreatedBy(user.getUsername());
+				if (episodeForUrl.getCreatedBy() == null || "".equals(episodeForUrl.getModifiedBy()))
+					episodeForUrl.setModifiedBy(user.getUsername());
+
+				episodeObj = episodeForUrl;
+			}//else..
+
+			try {
+				episodeRepository.save(episodeObj);
+			}
+			catch (DataException dataException){
+				dataException.printStackTrace();
+			}
 		}//for..
 	}//syncEpisodesForPodcastFromRSSFeed..
 
@@ -214,7 +358,7 @@ public class SyncService {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 
-		this.syncCategoriesFromGpodder();
+		this.syncCategoriesFromGpodder(id);
 		List<Category> syncedCategories = (List<Category>) categoryRepository.findAll();
 		return new ResponseEntity<>(syncedCategories, HttpStatus.OK);
 	}
@@ -233,7 +377,7 @@ public class SyncService {
 		ResponseWrapper responseWrapper = new ResponseWrapper();
 
 		try {
-			this.syncPodcastsForAllCategoriesFromGpodder();
+			this.syncPodcastsForAllCategoriesFromGpodder(id);
 			responseWrapper.setSuccess(true);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -255,7 +399,7 @@ public class SyncService {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 
-		this.syncPodcastsForCategoryFromGpodder(categoryId);
+		this.syncPodcastsForCategoryFromGpodder(id, categoryId);
 		List<Podcast> syncedPodcasts = podcastRepository.getPodcastsForCategory(categoryId);
 		return new ResponseEntity<>(syncedPodcasts, HttpStatus.OK);
 	}
@@ -272,7 +416,7 @@ public class SyncService {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 
-		this.syncEpisodesForPodcastFromRSSFeed(podcastId);
+		this.syncEpisodesForPodcastFromRSSFeed(id, podcastId);
 		List<Episode> syncedEpisodes = episodeRepository.findEpisodesByPodcastId(podcastId);
 		return new ResponseEntity<>(syncedEpisodes, HttpStatus.OK);
 	}

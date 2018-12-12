@@ -44,7 +44,8 @@ public class EpisodeService {
 			userId = (int) httpSession.getAttribute("id");
 		List<Episode> episodes = episodeRepository.findEpisodesByPodcastId(podcastId);
 		if (episodes.size() == 0) {
-			syncService.syncEpisodesForPodcastFromRSSFeed(podcastId);
+			//TODO: This will add the querying user as the user in audit fields for created by, modified by
+			syncService.syncEpisodesForPodcastFromRSSFeed(userId, podcastId);
 			episodes = episodeRepository.findEpisodesByPodcastId(podcastId);
 		}
 		if (userId != 0){
