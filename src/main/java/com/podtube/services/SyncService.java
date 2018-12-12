@@ -254,11 +254,12 @@ public class SyncService {
 
 	public void syncEpisodesForPodcastFromRSSFeed(int userId, int podcastId){
 
+		User user = null;
 		if(userId<1){
-			return;
+			user = userRepository.findUserByUsernameEquals("admin");
+		} else {
+			user = userRepository.findByIdEquals(userId);
 		}
-
-		User user = userRepository.findByIdEquals(userId);
 
 		if(user==null){
 			return;
