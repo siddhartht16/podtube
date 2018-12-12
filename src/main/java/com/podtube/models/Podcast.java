@@ -27,6 +27,7 @@ public class Podcast {
 	private Set<Category> categories = new HashSet<>();
 
 	@Column(name = "url")
+	@Lob
 	private String url;
 
 	@Column(name = "title")
@@ -43,6 +44,7 @@ public class Podcast {
 	private int gpodder_subscribers_last_week;
 
 	@Column(name = "logo_url")
+	@Lob
 	private String logo_url;
 
 	@Column(name = "scaled_logo_url")
@@ -69,6 +71,18 @@ public class Podcast {
 
 	@Column(name = "modified_by")
 	private String modifiedBy;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "last_synced_on")
+	private Date lastSyncedOn;
+
+	public Date getLastSyncedOn() {
+		return lastSyncedOn;
+	}
+
+	public void setLastSyncedOn(Date lastSyncedOn) {
+		this.lastSyncedOn = lastSyncedOn;
+	}
 
 	@Column(name = "author")
 	private String author;
@@ -170,5 +184,13 @@ public class Podcast {
 	@Override
 	public int hashCode() {
 		return url.hashCode();
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public String getModifiedBy() {
+		return modifiedBy;
 	}
 }

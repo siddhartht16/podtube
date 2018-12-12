@@ -42,6 +42,18 @@ public class Category {
 	@LastModifiedDate
 	private Date modifiedOn;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "last_synced_on")
+	private Date lastSyncedOn;
+
+	public Date getLastSyncedOn() {
+		return lastSyncedOn;
+	}
+
+	public void setLastSyncedOn(Date lastSyncedOn) {
+		this.lastSyncedOn = lastSyncedOn;
+	}
+
 	public Category() {}
 
 	@Override
@@ -83,5 +95,13 @@ public class Category {
 
 	public void setModifiedBy(String modifiedBy) {
 		this.modifiedBy = modifiedBy;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public String getModifiedBy() {
+		return modifiedBy;
 	}
 }

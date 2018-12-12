@@ -89,6 +89,18 @@ public class Episode {
 	@Transient
 	private boolean isPlayed;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "last_synced_on")
+	private Date lastSyncedOn;
+
+	public Date getLastSyncedOn() {
+		return lastSyncedOn;
+	}
+
+	public void setLastSyncedOn(Date lastSyncedOn) {
+		this.lastSyncedOn = lastSyncedOn;
+	}
+
 	@Transient
 	boolean isBookmarked;
 
@@ -183,5 +195,21 @@ public class Episode {
 
 	public void setBookmarked(boolean bookmarked) {
 		isBookmarked = bookmarked;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public void setModifiedBy(String modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public String getModifiedBy() {
+		return modifiedBy;
 	}
 }
