@@ -1,5 +1,6 @@
 package com.podtube.services;
 
+import com.podtube.customentities.ResponseWrapper;
 import com.podtube.datasourceapi.APIUtils;
 import com.podtube.feedentities.RSSFeedItem;
 import com.podtube.gpodderentities.GPodderCategory;
@@ -71,6 +72,21 @@ public class SyncService {
 
 				categoryRepository.save(category);
 			}//if..
+		}//for..
+	}//syncCategoriesFromGpodder..
+
+	private void syncPodcastsForAllCategoriesFromGpodder() throws InterruptedException {
+
+		this.syncCategoriesFromGpodder();
+		Thread.sleep(1000);
+
+		List<Category> categoriesList = (List<Category>) categoryRepository.findAll();
+
+		for (Category category : categoriesList) {
+
+			int categoryId = category.getId();
+			this.syncPodcastsForCategoryFromGpodder(categoryId);
+			Thread.sleep(1000);
 		}//for..
 	}//syncCategoriesFromGpodder..
 
@@ -202,6 +218,30 @@ public class SyncService {
 		List<Category> syncedCategories = (List<Category>) categoryRepository.findAll();
 		return new ResponseEntity<>(syncedCategories, HttpStatus.OK);
 	}
+
+	@PostMapping("/admin/sync/categories/all/podcasts")
+	public ResponseEntity<ResponseWrapper> syncAllCategoriesPodcasts(HttpSession httpSession) {
+		if (!ServiceUtils.isValidSession(httpSession))
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+		// check if logged in user is admin
+		int id = (int) httpSession.getAttribute("id");
+		if (!adminService.isAdminUser(id)) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+
+		ResponseWrapper responseWrapper = new ResponseWrapper();
+
+		try {
+			this.syncPodcastsForAllCategoriesFromGpodder();
+			responseWrapper.setSuccess(true);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			responseWrapper.setSuccess(false);
+		}
+
+		return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
+	}//syncAllCategoriesPodcasts..
 
 	@PostMapping("/admin/sync/categories/{categoryId}/podcasts")
 	public ResponseEntity<List<Podcast>> syncPodcastsForCategory(HttpSession httpSession,

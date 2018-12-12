@@ -61,6 +61,10 @@ public class Category {
 		return tag;
 	}
 
+	public int getId() {
+		return id;
+	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
